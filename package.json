@@ -1,0 +1,28 @@
+{
+    "name": "tw-to-rdb"
+  , "version": "0.0.1"
+  , "description": "Automagically save your Twitter Favorites to Readability"
+  , "homepage": ""
+  , "keywords": ["readability", "favorites", "twitter"]
+  , "author": "Brad Dickason <dickason@gmail.com>"
+  , "contributors": [
+        { "name": "Brad Dickason", "email": "dickason@gmail.com" }
+    ]
+  , "repository":{
+        "type": "git"
+      , "url": "https://github.com/bdickason/tw-to-rdb"
+    }
+  , "dependencies": {
+        "express": "3.0.1",
+        "coffee-script": "1.4.0",
+        "oauth": "0.9.8",
+    }
+  , "devDependencies": {
+        "mocha": "1.6.0"        
+    }
+  , "main": "index"
+  , "engines": { "node": ">= 0.4.0" }
+  , "scripts": {
+        "test": "make test"
+    }
+}
