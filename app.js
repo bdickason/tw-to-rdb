@@ -29,6 +29,10 @@
 
 
   app.get('/', function(req, res) {
+    return res.send("<HTML><BODY><A HREF='/tw'>Twitter: Get Favorites</A></BODY></HTML>");
+  });
+
+  app.get('/tw', function(req, res) {
     return tw.getFavorites(function(callback) {
       return res.send(callback);
     });

@@ -12,8 +12,10 @@ app.use express.session
 tw = new Twitter
 
 ### Routes ###      
-      
 app.get '/', (req, res) ->
+  res.send "<HTML><BODY><A HREF='/tw'>Twitter: Get Favorites</A></BODY></HTML>"
+  
+app.get '/tw', (req, res) ->
   tw.getFavorites (callback) ->
     res.send callback
   
