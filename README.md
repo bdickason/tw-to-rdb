@@ -8,8 +8,8 @@ Todo
 * ~~Get favorites from Twitter API~~
 * ~~Send link to Readability API~~
 * ~~Save favorite to 'Last Favorite'~~
-* Implement persistent storage (redis)
 * Automate it
+* Implement persistent storage (redis)
 
 
 ![alt text](http://i.imgur.com/hNo4G.png "Basic design")
