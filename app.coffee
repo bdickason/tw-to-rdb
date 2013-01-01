@@ -18,25 +18,11 @@ app.get '/', (req, res) ->
   res.send "<HTML><BODY><A HREF='/tw'>Twitter: Get Favorites</A><br /><A HREF='/rdb/login'>Readability: Get Access Token</A></BODY></HTML>"
   
 app.get '/tw', (req, res) ->
-  if req.session.lastFavorite
-    tw.getFavoritesFrom req.session.lastFavorite, (callback) ->
-      res.send callback
-  else
-    # No favorites have been pulled in this session
-    tw.getFavoritesFrom 1, (callback) ->
-      lastTweet = parseInt(callback[0].id) + 50
+  checkTweets req, res
 
-      for tweet in callback
-        for url in tweet.entities.urls # Twitter creates an array of url's that have additional metadata
-          rdb.addBookmark { url: url.expanded_url } 
-      req.session.lastFavorite = lastTweet
-      res.send callback
   
 app.get '/logout', (req, res) ->
   # Allow the user to logout (clear local cookies)
-  console.log '--- LOGOUT ---'
-  console.log req.session
-  console.log '--- LOGOUT ---'
   req.session.destroy()
   res.redirect '/'  
   
@@ -50,8 +36,6 @@ app.get '/rdb/login', (req, res) ->
     res.redirect "https://www.readability.com/api/rest/v1/oauth/authorize/?oauth_token=#{callback.oauth_token}&oauth_token_secret=#{callback.oauth_token_secret}"
 
 app.get '/rdb/callback', (req, res) ->
-  console.log 'Callback received from Readability'
-  console.log req.query
   rdb.handleCallback req.query.oauth_token, req.session.oauth_token_secret, req.query.oauth_verifier, (callback) ->
     req.session.oauth_access_token = callback.oauth_access_token
     req.session.oauth_access_token_secret = callback.oauth_access_token_secret
@@ -60,3 +44,18 @@ app.get '/rdb/callback', (req, res) ->
 ### Start the App ###
 
 app.listen '3000'
+
+checkTweets = (req, res) ->
+  if req.session.lastFavorite
+    tw.getFavoritesFrom req.session.lastFavorite, (callback) ->
+      res.send callback
+  else
+    # No favorites have been pulled in this session
+    tw.getFavoritesFrom 1, (callback) ->
+      lastTweet = parseInt(callback[0].id) + 50
+
+      for tweet in callback
+        for url in tweet.entities.urls # Twitter creates an array of url's that have additional metadata
+          rdb.addBookmark { url: url.expanded_url } 
+      req.session.lastFavorite = lastTweet
+      res.send callback
