@@ -18,8 +18,15 @@ app.get '/', (req, res) ->
   res.send "<HTML><BODY><A HREF='/tw'>Twitter: Get Favorites</A><br /><A HREF='/rdb/login'>Readability: Get Access Token</A></BODY></HTML>"
   
 app.get '/tw', (req, res) ->
-  tw.getFavorites (callback) ->
-    res.send callback
+  if req.session.lastFavorite
+    tw.getFavoritesFrom req.session.lastFavorite, (callback) ->
+      res.send callback
+  else
+    # No favorites have been pulled in this session
+    tw.getFavoritesFrom 1, (callback) ->
+      lastTweet = parseInt(callback[0].id) + 50
+      req.session.lastFavorite = lastTweet
+      res.send callback
   
 app.get '/logout', (req, res) ->
   # Allow the user to logout (clear local cookies)

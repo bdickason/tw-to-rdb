@@ -37,9 +37,18 @@
   });
 
   app.get('/tw', function(req, res) {
-    return tw.getFavorites(function(callback) {
-      return res.send(callback);
-    });
+    if (req.session.lastFavorite) {
+      return tw.getFavoritesFrom(req.session.lastFavorite, function(callback) {
+        return res.send(callback);
+      });
+    } else {
+      return tw.getFavoritesFrom(1, function(callback) {
+        var lastTweet;
+        lastTweet = parseInt(callback[0].id) + 50;
+        req.session.lastFavorite = lastTweet;
+        return res.send(callback);
+      });
+    }
   });
 
   app.get('/logout', function(req, res) {
