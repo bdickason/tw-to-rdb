@@ -43,8 +43,19 @@
       });
     } else {
       return tw.getFavoritesFrom(1, function(callback) {
-        var lastTweet;
+        var lastTweet, tweet, url, _i, _j, _len, _len1, _ref;
         lastTweet = parseInt(callback[0].id) + 50;
+        for (_i = 0, _len = callback.length; _i < _len; _i++) {
+          tweet = callback[_i];
+          _ref = tweet.entities.urls;
+          for (_j = 0, _len1 = _ref.length; _j < _len1; _j++) {
+            url = _ref[_j];
+            console.log(url);
+            rdb.addBookmark({
+              url: url.expanded_url
+            });
+          }
+        }
         req.session.lastFavorite = lastTweet;
         return res.send(callback);
       });

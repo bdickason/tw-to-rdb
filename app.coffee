@@ -25,6 +25,11 @@ app.get '/tw', (req, res) ->
     # No favorites have been pulled in this session
     tw.getFavoritesFrom 1, (callback) ->
       lastTweet = parseInt(callback[0].id) + 50
+
+      for tweet in callback
+        for url in tweet.entities.urls # Twitter creates an array of url's that have additional metadata
+          console.log url
+          rdb.addBookmark { url: url.expanded_url } 
       req.session.lastFavorite = lastTweet
       res.send callback
   
