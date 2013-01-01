@@ -33,7 +33,7 @@
 
 
   app.get('/', function(req, res) {
-    return res.send("<HTML><BODY><A HREF='/tw'>Twitter: Get Favorites</A></BODY></HTML>");
+    return res.send("<HTML><BODY><A HREF='/tw'>Twitter: Get Favorites</A><br /><A HREF='/rdb/login'>Readability: Get Access Token</A></BODY></HTML>");
   });
 
   app.get('/tw', function(req, res) {
@@ -68,9 +68,7 @@
     return rdb.handleCallback(req.query.oauth_token, req.session.oauth_token_secret, req.query.oauth_verifier, function(callback) {
       req.session.oauth_access_token = callback.oauth_access_token;
       req.session.oauth_access_token_secret = callback.oauth_access_token_secret;
-      console.log(req.session.oauth_access_token);
-      console.log(req.session.oauth_access_token_secret);
-      return res.redirect('/');
+      return res.send("<HTML><BODY><A HREF='/'>Home</A><BR /><BR /><STRONG>export RDB_ACCESS_TOKEN='" + req.session.oauth_access_token + "'<BR />export RDB_ACCESS_TOKEN_SECRET='" + req.session.oauth_access_token_secret + "</strong><br /><br /><em>Hint: copy/paste this into ~/.profile</BODY></HTML>");
     });
   });
 
