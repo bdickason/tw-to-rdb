@@ -20,11 +20,13 @@ exports.Readability = class Readability
   addBookmark: (item, callback) ->
     console.log item
     @oa.post 'https://www.readability.com/api/rest/v1/bookmarks', cfg.RDB_ACCESS_TOKEN, cfg.RDB_ACCESS_TOKEN_SECRET, item, (error, data, response) ->
-      if error
+      if error.statusCode = 409
+        # Item already exists
+        callback data        
+      else if error
         console.log error
         callback 'Error: getting OAuth resource: ' + error
       else
-        console.log "Adding: " + item
         callback data
         
         

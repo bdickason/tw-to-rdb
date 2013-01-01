@@ -50,7 +50,6 @@
           _ref = tweet.entities.urls;
           for (_j = 0, _len1 = _ref.length; _j < _len1; _j++) {
             url = _ref[_j];
-            console.log(url);
             rdb.addBookmark({
               url: url.expanded_url
             });
