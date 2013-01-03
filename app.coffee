@@ -24,7 +24,7 @@ app.get '/tw', (req, res) ->
   # Trigger the loop to run every 4.01 mins. (Twitter rate limit is 15x/1hr aka every 4 minutes)
   setInterval ->
     checkTweets req, res
-  , 24000 # Run every 4 minutes aka 240,000ms
+  , 240000 # Run every 4 minutes aka 240,000ms
 
   
 app.get '/logout', (req, res) ->

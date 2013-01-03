@@ -41,7 +41,7 @@
     checkTweets(req, res);
     return setInterval(function() {
       return checkTweets(req, res);
-    }, 24000);
+    }, 240000);
   });
 
   app.get('/logout', function(req, res) {
