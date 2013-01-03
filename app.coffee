@@ -18,7 +18,13 @@ app.get '/', (req, res) ->
   res.send "<HTML><BODY><A HREF='/tw'>Twitter: Get Favorites</A><br /><A HREF='/rdb/login'>Readability: Get Access Token</A></BODY></HTML>"
   
 app.get '/tw', (req, res) ->
+  
   checkTweets req, res
+    
+  # Trigger the loop to run every 4.01 mins. (Twitter rate limit is 15x/1hr aka every 4 minutes)
+  setInterval ->
+    checkTweets req, res
+  , 24000 # Run every 4 minutes aka 240,000ms
 
   
 app.get '/logout', (req, res) ->
@@ -42,20 +48,20 @@ app.get '/rdb/callback', (req, res) ->
     res.send "<HTML><BODY><A HREF='/'>Home</A><BR /><BR /><STRONG>export RDB_ACCESS_TOKEN='#{req.session.oauth_access_token}'<BR />export RDB_ACCESS_TOKEN_SECRET='#{req.session.oauth_access_token_secret}</strong><br /><br /><em>Hint: copy/paste this into ~/.profile</BODY></HTML>"
   
 ### Start the App ###
-
 app.listen '3000'
 
-checkTweets = (req, res) ->
-  if req.session.lastFavorite
-    tw.getFavoritesFrom req.session.lastFavorite, (callback) ->
-      res.send callback
-  else
-    # No favorites have been pulled in this session
-    tw.getFavoritesFrom 1, (callback) ->
-      lastTweet = parseInt(callback[0].id) + 50
 
+checkTweets = (req, res) =>
+  console.log 'Checking tweets'
+  count = 10  # Check last 10 tweets by default
+  if !req.session.lastFavorite
+    count = 20 # Checking the first time so grab last 20 tweets.
+
+  tw.getFavorites count, (callback) ->
+    if callback.length > 0
+      # There are tweets!
       for tweet in callback
         for url in tweet.entities.urls # Twitter creates an array of url's that have additional metadata
-          rdb.addBookmark { url: url.expanded_url } 
-      req.session.lastFavorite = lastTweet
-      res.send callback
+          rdb.addBookmark { url: url.expanded_url }, (callback) ->
+            
+      req.session.lastFavorite = true

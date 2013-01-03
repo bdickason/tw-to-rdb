@@ -13,20 +13,24 @@ exports.Readability = class Readability
   getBookmarks: (callback) ->
     @oa.getProtectedResource 'https://www.readability.com/api/rest/v1/bookmarks', 'GET', cfg.RDB_ACCESS_TOKEN, cfg.RDB_ACCESS_TOKEN_SECRET, (error, data, response) ->
       if error
-        callback 'Error: getting OAuth resource: ' + error
+        console.log error
+        callback 'Error: getting OAuth resource: '
       else
         callback data
 
   addBookmark: (item, callback) ->
-    console.log item
     @oa.post 'https://www.readability.com/api/rest/v1/bookmarks', cfg.RDB_ACCESS_TOKEN, cfg.RDB_ACCESS_TOKEN_SECRET, item, (error, data, response) ->
-      if error.statusCode = 409
-        # Item already exists
-        callback data        
-      else if error
-        console.log error
-        callback 'Error: getting OAuth resource: ' + error
+      if error
+        if error.statusCode = 409
+          # Item already exists
+          callback "Warning: Item already exists."
+        else
+          console.log error
+          callback 'Error: getting OAuth resource.'
       else
+        # Success!
+        console.log "Successfully added: "
+        console.log item
         callback data
         
         
