@@ -16,21 +16,16 @@ rdb = new Readability
 ### Routes ###      
 app.get '/', (req, res) ->
   res.send "<HTML><BODY><A HREF='/tw'>Twitter: Get Favorites</A><br /><A HREF='/rdb/login'>Readability: Get Access Token</A></BODY></HTML>"
-  
-app.get '/tw', (req, res) ->
-  
-  checkTweets req, res
-    
-  # Trigger the loop to run every 4.01 mins. (Twitter rate limit is 15x/1hr aka every 4 minutes)
-  setInterval ->
-    checkTweets req, res
-  , 240000 # Run every 4 minutes aka 240,000ms
 
-  
 app.get '/logout', (req, res) ->
-  # Allow the user to logout (clear local cookies)
+  # Allow the user to logout (clear local session)
   req.session.destroy()
   res.redirect '/'  
+
+app.get '/tw', (req, res) ->
+  tw.getFavorites 20, (callback) ->
+    res.send callback
+  
   
 ### Readability Auth to retrieve access tokens, etc. ###
 app.get '/rdb/login', (req, res) ->
@@ -47,15 +42,10 @@ app.get '/rdb/callback', (req, res) ->
     req.session.oauth_access_token_secret = callback.oauth_access_token_secret
     res.send "<HTML><BODY><A HREF='/'>Home</A><BR /><BR /><STRONG>export RDB_ACCESS_TOKEN='#{req.session.oauth_access_token}'<BR />export RDB_ACCESS_TOKEN_SECRET='#{req.session.oauth_access_token_secret}</strong><br /><br /><em>Hint: copy/paste this into ~/.profile</BODY></HTML>"
   
-### Start the App ###
-app.listen '3000'
-
-
-checkTweets = (req, res) =>
+### Support functions ###
+checkTweets = =>
   console.log 'Checking tweets'
   count = 10  # Check last 10 tweets by default
-  if !req.session.lastFavorite
-    count = 20 # Checking the first time so grab last 20 tweets.
 
   tw.getFavorites count, (callback) ->
     if callback.length > 0
@@ -63,5 +53,14 @@ checkTweets = (req, res) =>
       for tweet in callback
         for url in tweet.entities.urls # Twitter creates an array of url's that have additional metadata
           rdb.addBookmark { url: url.expanded_url }, (callback) ->
-            
-      req.session.lastFavorite = true
+
+### Start the App ###
+app.listen '3000'
+
+checkTweets -> # Run once immediately
+
+# Trigger the loop to run every 4.01 mins. (Twitter rate limit is 15x/1hr aka every 4 minutes)
+setInterval ->
+  checkTweets
+, 240000 # Run every 4 minutes aka 240,000ms
+

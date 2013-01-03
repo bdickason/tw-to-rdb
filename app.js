@@ -37,16 +37,15 @@
     return res.send("<HTML><BODY><A HREF='/tw'>Twitter: Get Favorites</A><br /><A HREF='/rdb/login'>Readability: Get Access Token</A></BODY></HTML>");
   });
 
-  app.get('/tw', function(req, res) {
-    checkTweets(req, res);
-    return setInterval(function() {
-      return checkTweets(req, res);
-    }, 240000);
-  });
-
   app.get('/logout', function(req, res) {
     req.session.destroy();
     return res.redirect('/');
+  });
+
+  app.get('/tw', function(req, res) {
+    return tw.getFavorites(20, function(callback) {
+      return res.send(callback);
+    });
   });
 
   /* Readability Auth to retrieve access tokens, etc.
@@ -69,35 +68,48 @@
     });
   });
 
+  /* Support functions
+  */
+
+
+  checkTweets = function() {
+    var count;
+    console.log('Checking tweets');
+    count = 10;
+    return tw.getFavorites(count, function(callback) {
+      var tweet, url, _i, _len, _results;
+      if (callback.length > 0) {
+        _results = [];
+        for (_i = 0, _len = callback.length; _i < _len; _i++) {
+          tweet = callback[_i];
+          _results.push((function() {
+            var _j, _len1, _ref, _results1;
+            _ref = tweet.entities.urls;
+            _results1 = [];
+            for (_j = 0, _len1 = _ref.length; _j < _len1; _j++) {
+              url = _ref[_j];
+              _results1.push(rdb.addBookmark({
+                url: url.expanded_url
+              }, function(callback) {}));
+            }
+            return _results1;
+          })());
+        }
+        return _results;
+      }
+    });
+  };
+
   /* Start the App
   */
 
 
   app.listen('3000');
 
-  checkTweets = function(req, res) {
-    var count;
-    console.log('Checking tweets');
-    count = 10;
-    if (!req.session.lastFavorite) {
-      count = 20;
-    }
-    return tw.getFavorites(count, function(callback) {
-      var tweet, url, _i, _j, _len, _len1, _ref;
-      if (callback.length > 0) {
-        for (_i = 0, _len = callback.length; _i < _len; _i++) {
-          tweet = callback[_i];
-          _ref = tweet.entities.urls;
-          for (_j = 0, _len1 = _ref.length; _j < _len1; _j++) {
-            url = _ref[_j];
-            rdb.addBookmark({
-              url: url.expanded_url
-            }, function(callback) {});
-          }
-        }
-        return req.session.lastFavorite = true;
-      }
-    });
-  };
+  checkTweets(function() {});
+
+  setInterval(function() {
+    return checkTweets;
+  }, 240000);
 
 }).call(this);
