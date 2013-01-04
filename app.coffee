@@ -4,11 +4,22 @@ Twitter = (require './lib/twitter.js').Twitter
 Readability = (require './lib/readability.js').Readability
 
 Redis = require 'redis'
+RedisStore = (require 'connect-redis')(express)
 
 app = express()
 app.use express.bodyParser()
 app.use express.cookieParser()
+
+### Populates:
+   - req.session
+   - req.sessionStore
+   - req.sessionID
+
+ If no DB match for session stored in browser cookie, connect.session generates a new one. 14 day maxAge ###
 app.use express.session
+  store: new RedisStore # Populates req.session, req.sessionStore, req.sessionID
+    'db': '1'
+    maxAge: 1209600000 # 14 day max age
   secret: 'blahblahblah'  # Random hash for session store
 
 # Start up redis to cache stuff
