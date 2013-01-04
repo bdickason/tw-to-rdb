@@ -21,15 +21,6 @@
 
   app.use(express.cookieParser());
 
-  /* Populates:
-     - req.session
-     - req.sessionStore
-     - req.sessionID
-  
-   If no DB match for session stored in browser cookie, connect.session generates a new one. 14 day maxAge
-  */
-
-
   app.use(express.session({
     store: new RedisStore({
       'db': '1',
