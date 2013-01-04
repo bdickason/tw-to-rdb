@@ -5,7 +5,7 @@
 
 
 (function() {
-  var Twitter, cfg, should, tw;
+  var Redis, Twitter, cfg, redis, should, tw;
 
   cfg = require('../cfg/config.js');
 
@@ -13,7 +13,15 @@
 
   Twitter = (require('../lib/twitter.js')).Twitter;
 
-  tw = new Twitter(cfg);
+  Redis = require('redis');
+
+  redis = Redis.createClient(cfg.REDIS_PORT, cfg.REDIS_HOSTNAME);
+
+  redis.on('error', function(err) {
+    return console.log('REDIS Error:' + err);
+  });
+
+  tw = new Twitter(cfg, redis);
 
   describe('Twitter connection', function() {
     return it('Should retrieve at least one favorite', function(done) {

@@ -14,6 +14,8 @@
 
   exports.TW_ACCESS_TOKEN_SECRET = process.env.TW_ACCESS_TOKEN_SECRET || '';
 
+  exports.TW_USERNAME = process.env.TW_USERNAME || '';
+
   exports.RDB_CONSUMER_KEY = process.env.RDB_CONSUMER_KEY || '';
 
   exports.RDB_CONSUMER_SECRET = process.env.RDB_CONSUMER_SECRET || '';

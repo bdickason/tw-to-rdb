@@ -3,9 +3,15 @@
 cfg = require '../cfg/config.js'
 should = require 'should'
 Twitter = (require '../lib/twitter.js').Twitter
+Redis = require 'redis'
 
+# Start up redis
+redis = Redis.createClient cfg.REDIS_PORT, cfg.REDIS_HOSTNAME
+redis.on 'error', (err) ->
+  console.log 'REDIS Error:' + err
+  
 # Initialize controller
-tw = new Twitter cfg
+tw = new Twitter cfg, redis
 
 describe 'Twitter connection', ->
   it 'Should retrieve at least one favorite', (done) ->

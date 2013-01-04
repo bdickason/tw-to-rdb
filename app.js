@@ -39,9 +39,9 @@
   */
 
 
-  tw = new Twitter(cfg);
+  tw = new Twitter(cfg, redis);
 
-  rdb = new Readability(cfg);
+  rdb = new Readability(cfg, redis);
 
   /* Routes
   */
@@ -120,10 +120,13 @@
 
   app.listen('3000');
 
-  checkTweets(function() {});
+  /*checkTweets -> # Run once immediately
+  
+  # Trigger the loop to run every 4.01 mins. (Twitter rate limit is 15x/1hr aka every 4 minutes)
+  setInterval ->
+    checkTweets
+  , 240000 # Run every 4 minutes aka 240,000ms
+  */
 
-  setInterval(function() {
-    return checkTweets;
-  }, 240000);
 
 }).call(this);

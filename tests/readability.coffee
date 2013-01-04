@@ -3,9 +3,16 @@
 cfg = require '../cfg/config.js'
 should = require 'should'
 Readability = (require '../lib/readability.js').Readability
+Redis = require 'redis'
+
+# Start up redis
+redis = Redis.createClient cfg.REDIS_PORT, cfg.REDIS_HOSTNAME
+redis.on 'error', (err) ->
+  console.log 'REDIS Error:' + err
 
 # Initialize controller
-rdb = new Readability cfg
+rdb = new Readability cfg, redis
+
 
 
 describe 'Readability connection', ->

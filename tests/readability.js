@@ -5,7 +5,7 @@
 
 
 (function() {
-  var Readability, cfg, rdb, should;
+  var Readability, Redis, cfg, rdb, redis, should;
 
   cfg = require('../cfg/config.js');
 
@@ -13,7 +13,15 @@
 
   Readability = (require('../lib/readability.js')).Readability;
 
-  rdb = new Readability(cfg);
+  Redis = require('redis');
+
+  redis = Redis.createClient(cfg.REDIS_PORT, cfg.REDIS_HOSTNAME);
+
+  redis.on('error', function(err) {
+    return console.log('REDIS Error:' + err);
+  });
+
+  rdb = new Readability(cfg, redis);
 
   describe('Readability connection', function() {
     it('Can retrieve your bookmarks', function(done) {

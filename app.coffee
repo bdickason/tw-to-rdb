@@ -16,18 +16,18 @@ app.use express.session
     maxAge: 1209600000 # 14 day max age
   secret: 'blahblahblah'  # Random hash for session store
 
-# Start up redis to cache stuff
+# Start up redis
 redis = Redis.createClient cfg.REDIS_PORT, cfg.REDIS_HOSTNAME
 redis.on 'error', (err) ->
   console.log 'REDIS Error:' + err
 
 
 ### Controllers ###
-tw = new Twitter cfg
-rdb = new Readability cfg
+tw = new Twitter cfg, redis
+rdb = new Readability cfg, redis
 
 ### Routes ###      
-app.get '/', (req, res) ->
+app.get '/', (req, res) ->    
   res.send "<HTML><BODY><A HREF='/tw'>Twitter: Get Favorites</A><br /><A HREF='/rdb/login'>Readability: Get Access Token</A></BODY></HTML>"
 
 app.get '/logout', (req, res) ->
@@ -70,10 +70,10 @@ checkTweets = =>
 ### Start the App ###
 app.listen '3000'
 
-checkTweets -> # Run once immediately
+###checkTweets -> # Run once immediately
 
 # Trigger the loop to run every 4.01 mins. (Twitter rate limit is 15x/1hr aka every 4 minutes)
 setInterval ->
   checkTweets
 , 240000 # Run every 4 minutes aka 240,000ms
-
+###
