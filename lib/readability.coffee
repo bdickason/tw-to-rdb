@@ -13,27 +13,35 @@ exports.Readability = class Readability
 
   
   getBookmarks: (callback) ->
-    @oa.getProtectedResource 'https://www.readability.com/api/rest/v1/bookmarks', 'GET', @cfg.RDB_ACCESS_TOKEN, @cfg.RDB_ACCESS_TOKEN_SECRET, (error, data, response) ->
+    @redis.hgetall "user:#{@cfg.TW_USERNAME}:Readability", (error, reply) =>
       if error
         console.log error
-        callback 'Error: getting OAuth resource: '
       else
-        callback data
+        @oa.getProtectedResource 'https://www.readability.com/api/rest/v1/bookmarks', 'GET', reply.access_token, reply.access_token_secret, (error, data, response) ->
+          if error
+            console.log error
+            callback 'Error: getting OAuth resource: '
+          else
+            callback data
 
   addBookmark: (item, callback) ->
-    @oa.post 'https://www.readability.com/api/rest/v1/bookmarks', @cfg.RDB_ACCESS_TOKEN, @cfg.RDB_ACCESS_TOKEN_SECRET, item, (error, data, response) ->
+    @redis.hgetall "user:#{@cfg.TW_USERNAME}:Readability", (error, reply) =>
       if error
-        if error.statusCode = 409
-          # Item already exists
-          callback "Warning: Item already exists."
-        else
-          console.log error
-          callback 'Error: getting OAuth resource.'
+        console.log error
       else
-        # Success!
-        console.log "Successfully added: "
-        console.log item
-        callback data
+        @oa.post 'https://www.readability.com/api/rest/v1/bookmarks', reply.access_token, reply.access_token_secret, item, (error, data, response) ->
+          if error
+            if error.statusCode = 409
+              # Item already exists
+              callback "Warning: Item already exists."
+            else
+              console.log error
+              callback 'Error: getting OAuth resource.'
+          else
+            # Success!
+            console.log "Successfully added: "
+            console.log item
+            callback data
         
         
   login: (callback) ->
