@@ -15,7 +15,8 @@
   , "dependencies": {
         "express": "3.0.1",
         "coffee-script": "1.4.0",
-        "oauth": "0.9.8"
+        "oauth": "0.9.8",
+		"redis": "0.8.2"
     }
   , "devDependencies": {
         "mocha": "1.6.0",

@@ -8,7 +8,7 @@ Todo
 * ~~Get favorites from Twitter API~~
 * ~~Send link to Readability API~~
 * ~~Save favorite to 'Last Favorite'~~
-* Automate it
+* ~~Automate it~~
 * Implement persistent storage (redis)
 
 
