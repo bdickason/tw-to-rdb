@@ -5,7 +5,7 @@ should = require 'should'
 Readability = (require '../lib/readability.js').Readability
 
 # Initialize controller
-rdb = new Readability
+rdb = new Readability cfg
 
 
 describe 'Readability connection', ->

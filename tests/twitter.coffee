@@ -5,9 +5,9 @@ should = require 'should'
 Twitter = (require '../lib/twitter.js').Twitter
 
 # Initialize controller
-tw = new Twitter
+tw = new Twitter cfg
 
 describe 'Twitter connection', ->
   it 'Should retrieve at least one favorite', (done) ->
-    tw.getFavorites (callback) ->
+    tw.getFavorites 10, (callback) ->
       done()

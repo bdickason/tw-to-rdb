@@ -13,7 +13,7 @@
 
   Readability = (require('../lib/readability.js')).Readability;
 
-  rdb = new Readability;
+  rdb = new Readability(cfg);
 
   describe('Readability connection', function() {
     it('Can retrieve your bookmarks', function(done) {

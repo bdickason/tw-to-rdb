@@ -2,6 +2,7 @@ express = require 'express'
 cfg = require './cfg/config.js'
 Twitter = (require './lib/twitter.js').Twitter
 Readability = (require './lib/readability.js').Readability
+
 Redis = require 'redis'
 
 app = express()
@@ -17,8 +18,8 @@ redis.on 'error', (err) ->
 
 
 ### Controllers ###
-tw = new Twitter
-rdb = new Readability
+tw = new Twitter cfg
+rdb = new Readability cfg
 
 ### Routes ###      
 app.get '/', (req, res) ->

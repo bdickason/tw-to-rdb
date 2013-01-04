@@ -33,9 +33,9 @@
   */
 
 
-  tw = new Twitter;
+  tw = new Twitter(cfg);
 
-  rdb = new Readability;
+  rdb = new Readability(cfg);
 
   /* Routes
   */

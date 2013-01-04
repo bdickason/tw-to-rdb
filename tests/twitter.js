@@ -13,11 +13,11 @@
 
   Twitter = (require('../lib/twitter.js')).Twitter;
 
-  tw = new Twitter;
+  tw = new Twitter(cfg);
 
   describe('Twitter connection', function() {
     return it('Should retrieve at least one favorite', function(done) {
-      return tw.getFavorites(function(callback) {
+      return tw.getFavorites(10, function(callback) {
         return done();
       });
     });
