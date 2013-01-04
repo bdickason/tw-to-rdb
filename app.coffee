@@ -2,12 +2,19 @@ express = require 'express'
 cfg = require './cfg/config.js'
 Twitter = (require './lib/twitter.js').Twitter
 Readability = (require './lib/readability.js').Readability
+Redis = require 'redis'
 
 app = express()
 app.use express.bodyParser()
 app.use express.cookieParser()
 app.use express.session
   secret: 'blahblahblah'  # Random hash for session store
+
+# Start up redis to cache stuff
+redis = Redis.createClient cfg.REDIS_PORT, cfg.REDIS_HOSTNAME
+redis.on 'error', (err) ->
+  console.log 'REDIS Error:' + err
+
 
 ### Controllers ###
 tw = new Twitter
