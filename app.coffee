@@ -27,8 +27,8 @@ tw = new Twitter cfg, redis
 rdb = new Readability cfg, redis
 
 ### Routes ###      
-app.get '/', (req, res) ->    
-  res.send "<HTML><BODY><A HREF='/tw'>Twitter: Get Favorites</A><br /><br /><strong>Authentication</strong><br /><A HREF='/rdb/login'>Readability: Get Access Token</A><br /><A HREF='/tw/login'>Twitter: Get Access Token</A></BODY></HTML>"
+app.get '/', (req, res) ->
+  res.send "<HTML><BODY><A HREF='/tw'>Twitter: Get Favorites</A><br /><br /><strong>Authentication</strong><br /><A HREF='/rdb/login'>Readability: Get Access Token</A><br /><A HREF='/tw/login'>Twitter: Get Access Token</A><br /><br/>Session:<br />#{JSON.stringify req.session}</BODY></HTML>"
 
 app.get '/logout', (req, res) ->
   # Allow the user to logout (clear local session)
@@ -53,11 +53,12 @@ app.get '/tw/login', (req, res) ->
 
 app.get '/tw/callback', (req, res) ->
   tw.handleCallback req.query.oauth_token, req.session.tw.oauth_token_secret, req.query.oauth_verifier, (callback) ->
+    req.session.tw.user_name = callback.user_name
     redis.sismember "user:#{callback.user_name}", "Twitter", (error, reply) =>
       if reply != 1  # User hasn't auth'd with twitter before
-        console.log "adding new Twitter account for user: #{cfg.TW_USERNAME}"
-        redis.sadd "users", "user:#{callback.user_name}", (error) ->
-          redis.sadd "user:#{callback.user_name}", "Twitter", (error) ->      
+        console.log "adding new Twitter account for user: #{callback.user_name}"
+        redis.sadd "users", "user:#{callback.user_name}", (error) =>
+          redis.sadd "user:#{callback.user_name}", "Twitter", (error) =>      
             if error
               console.log "Error: " + error
       redis.hmset "user:#{callback.user_name}:Twitter", "access_token", callback.oauth_access_token, "access_token_secret", callback.oauth_access_token_secret, (error, reply) ->
@@ -72,7 +73,7 @@ app.get '/rdb/login', (req, res) ->
   rdb.login (callback) ->
     if !req.session.rdb
       req.session.rdb = {}
-    
+
     # Store oauth_token + secret in session
     req.session.rdb.oauth_token = callback.oauth_token
     req.session.rdb.oauth_token_secret = callback.oauth_token_secret

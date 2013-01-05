@@ -48,7 +48,7 @@
 
 
   app.get('/', function(req, res) {
-    return res.send("<HTML><BODY><A HREF='/tw'>Twitter: Get Favorites</A><br /><br /><strong>Authentication</strong><br /><A HREF='/rdb/login'>Readability: Get Access Token</A><br /><A HREF='/tw/login'>Twitter: Get Access Token</A></BODY></HTML>");
+    return res.send("<HTML><BODY><A HREF='/tw'>Twitter: Get Favorites</A><br /><br /><strong>Authentication</strong><br /><A HREF='/rdb/login'>Readability: Get Access Token</A><br /><A HREF='/tw/login'>Twitter: Get Access Token</A><br /><br/>Session:<br />" + (JSON.stringify(req.session)) + "</BODY></HTML>");
   });
 
   app.get('/logout', function(req, res) {
@@ -80,9 +80,10 @@
   app.get('/tw/callback', function(req, res) {
     return tw.handleCallback(req.query.oauth_token, req.session.tw.oauth_token_secret, req.query.oauth_verifier, function(callback) {
       var _this = this;
+      req.session.tw.user_name = callback.user_name;
       return redis.sismember("user:" + callback.user_name, "Twitter", function(error, reply) {
         if (reply !== 1) {
-          console.log("adding new Twitter account for user: " + cfg.TW_USERNAME);
+          console.log("adding new Twitter account for user: " + callback.user_name);
           redis.sadd("users", "user:" + callback.user_name, function(error) {
             return redis.sadd("user:" + callback.user_name, "Twitter", function(error) {
               if (error) {
