@@ -51,9 +51,22 @@ app.get '/rdb/login', (req, res) ->
 
 app.get '/rdb/callback', (req, res) ->
   rdb.handleCallback req.query.oauth_token, req.session.oauth_token_secret, req.query.oauth_verifier, (callback) ->
-    req.session.oauth_access_token = callback.oauth_access_token
-    req.session.oauth_access_token_secret = callback.oauth_access_token_secret
-    res.send "<HTML><BODY><A HREF='/'>Home</A><BR /><BR /><STRONG>export RDB_ACCESS_TOKEN='#{req.session.oauth_access_token}'<BR />export RDB_ACCESS_TOKEN_SECRET='#{req.session.oauth_access_token_secret}</strong><br /><br /><em>Hint: copy/paste this into ~/.profile</BODY></HTML>"
+    redis.sismember "user:#{cfg.TW_USERNAME}", "Readability", (error, reply) =>
+      if reply != 1  # User hasn't auth'd with readability before
+        console.log "adding Readability account for user: #{cfg.TW_USERNAME}"
+        redis.sadd "user:#{cfg.TW_USERNAME}", "Readability", (error) ->      
+          if error
+            console.log "Error: " + error
+      redis.hmset "user:#{cfg.TW_USERNAME}:Readability", "access_token", callback.oauth_access_token, "access_token_secret", callback.oauth_access_token_secret, (error, reply) ->
+        console.log error
+        console.log reply
+        if error
+          console.log "Error: " + error
+        else
+          res.send "<HTML><BODY><A HREF='/'>Home</A><BR /><BR /><STRONG>export RDB_ACCESS_TOKEN='#{callback.oauth_access_token}'<BR />export RDB_ACCESS_TOKEN_SECRET='#{callback.oauth_access_token_secret}'</strong><br /><br /><em>Hint: copy/paste this into ~/.profile</BODY></HTML>"
+    # req.session.oauth_access_token_secret = callback.oauth_access_token
+    # req.session.oauth_access_token_secret = callback.oauth_access_token_secret
+
   
 ### Support functions ###
 checkTweets = =>
@@ -70,7 +83,7 @@ checkTweets = =>
 ### Start the App ###
 app.listen '3000'
 
-checkTweets -> # Run once immediately
+# checkTweets -> # Run once immediately
 
 ###
 # Trigger the loop to run every 4.01 mins. (Twitter rate limit is 15x/1hr aka every 4 minutes)

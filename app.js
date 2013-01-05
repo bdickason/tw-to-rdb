@@ -76,9 +76,26 @@
 
   app.get('/rdb/callback', function(req, res) {
     return rdb.handleCallback(req.query.oauth_token, req.session.oauth_token_secret, req.query.oauth_verifier, function(callback) {
-      req.session.oauth_access_token = callback.oauth_access_token;
-      req.session.oauth_access_token_secret = callback.oauth_access_token_secret;
-      return res.send("<HTML><BODY><A HREF='/'>Home</A><BR /><BR /><STRONG>export RDB_ACCESS_TOKEN='" + req.session.oauth_access_token + "'<BR />export RDB_ACCESS_TOKEN_SECRET='" + req.session.oauth_access_token_secret + "</strong><br /><br /><em>Hint: copy/paste this into ~/.profile</BODY></HTML>");
+      var _this = this;
+      return redis.sismember("user:" + cfg.TW_USERNAME, "Readability", function(error, reply) {
+        if (reply !== 1) {
+          console.log("adding Readability account for user: " + cfg.TW_USERNAME);
+          redis.sadd("user:" + cfg.TW_USERNAME, "Readability", function(error) {
+            if (error) {
+              return console.log("Error: " + error);
+            }
+          });
+        }
+        return redis.hmset("user:" + cfg.TW_USERNAME + ":Readability", "access_token", callback.oauth_access_token, "access_token_secret", callback.oauth_access_token_secret, function(error, reply) {
+          console.log(error);
+          console.log(reply);
+          if (error) {
+            return console.log("Error: " + error);
+          } else {
+            return res.send("<HTML><BODY><A HREF='/'>Home</A><BR /><BR /><STRONG>export RDB_ACCESS_TOKEN='" + callback.oauth_access_token + "'<BR />export RDB_ACCESS_TOKEN_SECRET='" + callback.oauth_access_token_secret + "'</strong><br /><br /><em>Hint: copy/paste this into ~/.profile</BODY></HTML>");
+          }
+        });
+      });
     });
   });
 
@@ -119,8 +136,6 @@
 
 
   app.listen('3000');
-
-  checkTweets(function() {});
 
   /*
   # Trigger the loop to run every 4.01 mins. (Twitter rate limit is 15x/1hr aka every 4 minutes)

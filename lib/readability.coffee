@@ -59,5 +59,5 @@ exports.Readability = class Readability
           console.log 'error :' + JSON.stringify error
         if response is undefined
           console.log 'error: ' + response
-
+  
         callback { oauth_access_token, oauth_access_token_secret }
