@@ -13,11 +13,12 @@
       , "url": "https://github.com/bdickason/tw-to-rdb"
     }
   , "dependencies": {
-        "express": "3.0.1",
-        "coffee-script": "1.4.0",
-        "oauth": "0.9.8",
-		"redis": "0.8.2",
-		"connect-redis": "1.4.5"
+    "express": "3.0.1",
+    "coffee-script": "1.4.0",
+    "oauth": "0.9.8",
+    "redis": "0.8.2",
+    "connect-redis": "1.4.5",
+    "jade": "0.27.7"
     }
   , "devDependencies": {
         "mocha": "1.6.0",

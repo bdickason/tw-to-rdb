@@ -9,6 +9,9 @@ RedisStore = (require 'connect-redis')(express)
 app = express()
 app.use express.bodyParser()
 app.use express.cookieParser()
+app.set 'views', __dirname + '/views'
+app.set 'view engine', 'jade'
+app.use express.static __dirname + '/public'  
 
 app.use express.session
   store: new RedisStore # Populates req.session, req.sessionStore, req.sessionID
@@ -28,16 +31,7 @@ rdb = new Readability cfg, redis
 
 ### Routes ###      
 app.get '/', (req, res) ->
-  res.send "<HTML><BODY>
-  <A HREF='/check/'>Check for New Favorites</A><br />
-  <A HREF='/tw'>Twitter: Get Favorites</A><br /><br />
-  
-  <strong>Authentication</strong><br />
-  <A HREF='/rdb/login'>Readability: Get Access Token</A><br />
-  <A HREF='/tw/login'>Twitter: Get Access Token</A><br /><br/>
-  
-  Session:<br />#{JSON.stringify req.session}
-  </BODY></HTML>"
+  res.render 'index', { "session": req.session }
 
 app.get '/check', (req, res) ->
   # Check for new favorites, save to readability

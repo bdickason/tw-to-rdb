@@ -21,6 +21,12 @@
 
   app.use(express.cookieParser());
 
+  app.set('views', __dirname + '/views');
+
+  app.set('view engine', 'jade');
+
+  app.use(express["static"](__dirname + '/public'));
+
   app.use(express.session({
     store: new RedisStore({
       'db': '1',
@@ -48,7 +54,9 @@
 
 
   app.get('/', function(req, res) {
-    return res.send("<HTML><BODY>  <A HREF='/check/'>Check for New Favorites</A><br />  <A HREF='/tw'>Twitter: Get Favorites</A><br /><br />    <strong>Authentication</strong><br />  <A HREF='/rdb/login'>Readability: Get Access Token</A><br />  <A HREF='/tw/login'>Twitter: Get Access Token</A><br /><br/>    Session:<br />" + (JSON.stringify(req.session)) + "  </BODY></HTML>");
+    return res.render('index', {
+      "session": req.session
+    });
   });
 
   app.get('/check', function(req, res) {
