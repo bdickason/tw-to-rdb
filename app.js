@@ -48,7 +48,7 @@
 
 
   app.get('/', function(req, res) {
-    return res.send("<HTML><BODY><A HREF='/tw'>Twitter: Get Favorites</A><br /><A HREF='/rdb/login'>Readability: Get Access Token</A></BODY></HTML>");
+    return res.send("<HTML><BODY><A HREF='/tw'>Twitter: Get Favorites</A><br /><br /><strong>Authentication</strong><br /><A HREF='/rdb/login'>Readability: Get Access Token</A><br /><A HREF='/tw/login'>Twitter: Get Access Token</A></BODY></HTML>");
   });
 
   app.get('/logout', function(req, res) {
@@ -66,16 +66,57 @@
   */
 
 
+  app.get('/tw/login', function(req, res) {
+    return tw.login(function(callback) {
+      if (!req.session.tw) {
+        req.session.tw = {};
+      }
+      req.session.tw.oauth_token = callback.oauth_token;
+      req.session.tw.oauth_token_secret = callback.oauth_token_secret;
+      return res.redirect("https://api.twitter.com/oauth/authorize?oauth_token=" + callback.oauth_token + "&oauth_token_secret=" + callback.oauth_token_secret);
+    });
+  });
+
+  app.get('/tw/callback', function(req, res) {
+    return tw.handleCallback(req.query.oauth_token, req.session.tw.oauth_token_secret, req.query.oauth_verifier, function(callback) {
+      var _this = this;
+      return redis.sismember("user:" + cfg.TW_USERNAME, "Twitter", function(error, reply) {
+        if (reply !== 1) {
+          console.log("adding Twitter account for user: " + cfg.TW_USERNAME);
+          redis.sadd("user:" + cfg.TW_USERNAME, "Twitter", function(error) {
+            if (error) {
+              return console.log("Error: " + error);
+            }
+          });
+        }
+        return redis.hmset("user:" + cfg.TW_USERNAME + ":Twitter", "access_token", callback.oauth_access_token, "access_token_secret", callback.oauth_access_token_secret, function(error, reply) {
+          if (error) {
+            return console.log("Error: " + error);
+          } else {
+            return res.send("<HTML><BODY><A HREF='/'>Home</A><BR /><BR /><STRONG>export TW_ACCESS_TOKEN='" + callback.oauth_access_token + "'<BR />export TW_ACCESS_TOKEN_SECRET='" + callback.oauth_access_token_secret + "'</strong><br /><br /><em>Hint: copy/paste this into ~/.profile</BODY></HTML>");
+          }
+        });
+      });
+    });
+  });
+
+  /* Readability Auth to retrieve access tokens, etc.
+  */
+
+
   app.get('/rdb/login', function(req, res) {
     return rdb.login(function(callback) {
-      req.session.oauth_token = callback.oauth_token;
-      req.session.oauth_token_secret = callback.oauth_token_secret;
+      if (!req.session.rdb) {
+        req.session.rdb = {};
+      }
+      req.session.rdb.oauth_token = callback.oauth_token;
+      req.session.rdb.oauth_token_secret = callback.oauth_token_secret;
       return res.redirect("https://www.readability.com/api/rest/v1/oauth/authorize/?oauth_token=" + callback.oauth_token + "&oauth_token_secret=" + callback.oauth_token_secret);
     });
   });
 
   app.get('/rdb/callback', function(req, res) {
-    return rdb.handleCallback(req.query.oauth_token, req.session.oauth_token_secret, req.query.oauth_verifier, function(callback) {
+    return rdb.handleCallback(req.query.oauth_token, req.session.rdb.oauth_token_secret, req.query.oauth_verifier, function(callback) {
       var _this = this;
       return redis.sismember("user:" + cfg.TW_USERNAME, "Readability", function(error, reply) {
         if (reply !== 1) {
