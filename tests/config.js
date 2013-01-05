@@ -17,19 +17,9 @@
       tmp = cfg.TW_CONSUMER_KEY;
       return tmp.should.not.eql('');
     });
-    it('Should have a consumer secret', function() {
+    return it('Should have a consumer secret', function() {
       var tmp;
       tmp = cfg.TW_CONSUMER_SECRET;
-      return tmp.should.not.eql('');
-    });
-    it('Should have an access token', function() {
-      var tmp;
-      tmp = cfg.TW_ACCESS_TOKEN;
-      return tmp.should.not.eql('');
-    });
-    return it('Should have an access token secret', function() {
-      var tmp;
-      tmp = cfg.TW_ACCESS_TOKEN_SECRET;
       return tmp.should.not.eql('');
     });
   });
@@ -40,19 +30,17 @@
       tmp = cfg.RDB_CONSUMER_KEY;
       return tmp.should.not.eql('');
     });
-    it('Should have a consumer secret', function() {
+    return it('Should have a consumer secret', function() {
       var tmp;
       tmp = cfg.RDB_CONSUMER_SECRET;
       return tmp.should.not.eql('');
     });
-    it('Should have an access token', function() {
+  });
+
+  describe('Twitter Username', function() {
+    return it('Should have a twitter username set', function() {
       var tmp;
-      tmp = cfg.RDB_ACCESS_TOKEN;
-      return tmp.should.not.eql('');
-    });
-    return it('Should have an access token secret', function() {
-      var tmp;
-      tmp = cfg.RDB_ACCESS_TOKEN_SECRET;
+      tmp = cfg.TW_USERNAME;
       return tmp.should.not.eql('');
     });
   });
