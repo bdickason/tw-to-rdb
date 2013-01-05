@@ -120,8 +120,9 @@
 
   app.listen('3000');
 
-  /*checkTweets -> # Run once immediately
-  
+  checkTweets(function() {});
+
+  /*
   # Trigger the loop to run every 4.01 mins. (Twitter rate limit is 15x/1hr aka every 4 minutes)
   setInterval ->
     checkTweets
