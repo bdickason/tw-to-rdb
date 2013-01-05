@@ -28,8 +28,13 @@ rdb = new Readability cfg, redis
 
 ### Routes ###      
 app.get '/', (req, res) ->
-  res.send "<HTML><BODY><A HREF='/tw'>Twitter: Get Favorites</A><br /><br /><strong>Authentication</strong><br /><A HREF='/rdb/login'>Readability: Get Access Token</A><br /><A HREF='/tw/login'>Twitter: Get Access Token</A><br /><br/>Session:<br />#{JSON.stringify req.session}</BODY></HTML>"
+  res.send "<HTML><BODY><A HREF='/check/'>Check for New Favorites</A><br /><A HREF='/tw'>Twitter: Get Favorites</A><br /><br /><strong>Authentication</strong><br /><A HREF='/rdb/login'>Readability: Get Access Token</A><br /><A HREF='/tw/login'>Twitter: Get Access Token</A><br /><br/>Session:<br />#{JSON.stringify req.session}</BODY></HTML>"
 
+app.get '/check', (req, res) ->
+  # Check for new favorites, save to readability
+  checkTweets ->
+    console.log "Checking Tweets"
+    
 app.get '/logout', (req, res) ->
   # Allow the user to logout (clear local session)
   req.session.destroy()
@@ -95,7 +100,6 @@ app.get '/rdb/callback', (req, res) ->
   
 ### Support functions ###
 checkTweets = =>
-  console.log 'Checking tweets'
   count = 10  # Check last 10 tweets by default
 
   tw.getFavorites count, (callback) ->

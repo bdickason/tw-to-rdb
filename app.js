@@ -48,7 +48,13 @@
 
 
   app.get('/', function(req, res) {
-    return res.send("<HTML><BODY><A HREF='/tw'>Twitter: Get Favorites</A><br /><br /><strong>Authentication</strong><br /><A HREF='/rdb/login'>Readability: Get Access Token</A><br /><A HREF='/tw/login'>Twitter: Get Access Token</A><br /><br/>Session:<br />" + (JSON.stringify(req.session)) + "</BODY></HTML>");
+    return res.send("<HTML><BODY><A HREF='/check/'>Check for New Favorites</A><br /><A HREF='/tw'>Twitter: Get Favorites</A><br /><br /><strong>Authentication</strong><br /><A HREF='/rdb/login'>Readability: Get Access Token</A><br /><A HREF='/tw/login'>Twitter: Get Access Token</A><br /><br/>Session:<br />" + (JSON.stringify(req.session)) + "</BODY></HTML>");
+  });
+
+  app.get('/check', function(req, res) {
+    return checkTweets(function() {
+      return console.log("Checking Tweets");
+    });
   });
 
   app.get('/logout', function(req, res) {
@@ -147,7 +153,6 @@
 
   checkTweets = function() {
     var count;
-    console.log('Checking tweets');
     count = 10;
     return tw.getFavorites(count, function(callback) {
       var tweet, url, _i, _len, _results;
