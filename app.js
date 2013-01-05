@@ -48,13 +48,13 @@
 
 
   app.get('/', function(req, res) {
-    return res.send("<HTML><BODY><A HREF='/check/'>Check for New Favorites</A><br /><A HREF='/tw'>Twitter: Get Favorites</A><br /><br /><strong>Authentication</strong><br /><A HREF='/rdb/login'>Readability: Get Access Token</A><br /><A HREF='/tw/login'>Twitter: Get Access Token</A><br /><br/>Session:<br />" + (JSON.stringify(req.session)) + "</BODY></HTML>");
+    return res.send("<HTML><BODY>  <A HREF='/check/'>Check for New Favorites</A><br />  <A HREF='/tw'>Twitter: Get Favorites</A><br /><br />    <strong>Authentication</strong><br />  <A HREF='/rdb/login'>Readability: Get Access Token</A><br />  <A HREF='/tw/login'>Twitter: Get Access Token</A><br /><br/>    Session:<br />" + (JSON.stringify(req.session)) + "  </BODY></HTML>");
   });
 
   app.get('/check', function(req, res) {
-    return checkTweets(function() {
-      return console.log("Checking Tweets");
-    });
+    checkTweets();
+    console.log("Checking Tweets");
+    return res.redirect('/');
   });
 
   app.get('/logout', function(req, res) {
@@ -102,7 +102,7 @@
           if (error) {
             return console.log("Error: " + error);
           } else {
-            return res.send("<HTML><BODY><A HREF='/'>Home</A><BR /><BR /><STRONG>export TW_ACCESS_TOKEN='" + callback.oauth_access_token + "'<BR />export TW_ACCESS_TOKEN_SECRET='" + callback.oauth_access_token_secret + "'</strong><br /><br /><em>Hint: copy/paste this into ~/.profile</BODY></HTML>");
+            return res.send("<HTML><BODY><A HREF='/'>Home</A><BR /><BR />                    <STRONG>export TW_ACCESS_TOKEN='" + callback.oauth_access_token + "'<BR />          export TW_ACCESS_TOKEN_SECRET='" + callback.oauth_access_token_secret + "'</strong><br /><br />                    <em>Hint: copy/paste this into ~/.profile          </BODY></HTML>");
           }
         });
       });
@@ -140,7 +140,7 @@
           if (error) {
             return console.log("Error: " + error);
           } else {
-            return res.send("<HTML><BODY><A HREF='/'>Home</A><BR /><BR /><STRONG>export RDB_ACCESS_TOKEN='" + callback.oauth_access_token + "'<BR />export RDB_ACCESS_TOKEN_SECRET='" + callback.oauth_access_token_secret + "'</strong><br /><br /><em>Hint: copy/paste this into ~/.profile</BODY></HTML>");
+            return res.send("<HTML><BODY>          <A HREF='/'>Home</A><BR /><BR />                    <STRONG>export RDB_ACCESS_TOKEN='" + callback.oauth_access_token + "'<BR />          export RDB_ACCESS_TOKEN_SECRET='" + callback.oauth_access_token_secret + "'</strong><br /><br />                    <em>Hint: copy/paste this into ~/.profile          </BODY></HTML>");
           }
         });
       });
@@ -151,7 +151,7 @@
   */
 
 
-  checkTweets = function() {
+  checkTweets = function(callback) {
     var count;
     count = 10;
     return tw.getFavorites(count, function(callback) {
@@ -168,7 +168,7 @@
               url = _ref[_j];
               _results1.push(rdb.addBookmark({
                 url: url.expanded_url
-              }, function(callback) {}));
+              }, function(cb) {}));
             }
             return _results1;
           })());
