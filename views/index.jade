@@ -10,6 +10,9 @@ html(lang="en")
       if session.tw.user_name
         p Twitter Username: 
           a(href="http://www.twitter.com/#{session.tw.user_name}", target="_blank") #{session.tw.user_name}
+          &nbsp;
+          / 
+          a(href="/logout") logout
     else
       p You are not logged in.
 

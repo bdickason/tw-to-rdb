@@ -26,6 +26,7 @@ exports.Twitter = class Twitter
       @oa.getOAuthRequestToken (error, oauth_token, oauth_token_secret, results) =>
         if error
           console.log 'error :' + JSON.stringify error
+                  
         callback { oauth_token, oauth_token_secret }
 
   handleCallback:  (oauth_token, oauth_token_secret, oauth_verifier, callback) ->

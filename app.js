@@ -87,7 +87,7 @@
       }
       req.session.tw.oauth_token = callback.oauth_token;
       req.session.tw.oauth_token_secret = callback.oauth_token_secret;
-      return res.redirect("https://api.twitter.com/oauth/authorize?oauth_token=" + callback.oauth_token + "&oauth_token_secret=" + callback.oauth_token_secret);
+      return res.redirect("https://api.twitter.com/oauth/authenticate?oauth_token=" + callback.oauth_token + "&oauth_token_secret=" + callback.oauth_token_secret);
     });
   });
 

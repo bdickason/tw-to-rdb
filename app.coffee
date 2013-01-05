@@ -51,6 +51,8 @@ app.get '/tw', (req, res) ->
 
 ### Readability Auth to retrieve access tokens, etc. ###
 app.get '/tw/login', (req, res) ->
+  
+  
   # Allow user to login using Twitter and collect request token
   tw.login (callback) ->
     # Store oauth_token + secret in session
@@ -58,7 +60,7 @@ app.get '/tw/login', (req, res) ->
       req.session.tw = {}
     req.session.tw.oauth_token = callback.oauth_token
     req.session.tw.oauth_token_secret = callback.oauth_token_secret
-    res.redirect "https://api.twitter.com/oauth/authorize?oauth_token=#{callback.oauth_token}&oauth_token_secret=#{callback.oauth_token_secret}"
+    res.redirect "https://api.twitter.com/oauth/authenticate?oauth_token=#{callback.oauth_token}&oauth_token_secret=#{callback.oauth_token_secret}"
 
 app.get '/tw/callback', (req, res) ->
   tw.handleCallback req.query.oauth_token, req.session.tw.oauth_token_secret, req.query.oauth_verifier, (callback) ->
