@@ -9,7 +9,7 @@ Todo
 * ~~Send link to Readability API~~
 * ~~Save favorite to 'Last Favorite'~~
 * ~~Automate it~~
-* Implement persistent storage (redis)
+* ~~Implement persistent storage (redis)~~
 * Deploy to live server
 * Allow multiple users
 * Create web interface to auth twitter

@@ -80,16 +80,18 @@
   app.get('/tw/callback', function(req, res) {
     return tw.handleCallback(req.query.oauth_token, req.session.tw.oauth_token_secret, req.query.oauth_verifier, function(callback) {
       var _this = this;
-      return redis.sismember("user:" + cfg.TW_USERNAME, "Twitter", function(error, reply) {
+      return redis.sismember("user:" + callback.user_name, "Twitter", function(error, reply) {
         if (reply !== 1) {
-          console.log("adding Twitter account for user: " + cfg.TW_USERNAME);
-          redis.sadd("user:" + cfg.TW_USERNAME, "Twitter", function(error) {
-            if (error) {
-              return console.log("Error: " + error);
-            }
+          console.log("adding new Twitter account for user: " + cfg.TW_USERNAME);
+          redis.sadd("users", "user:" + callback.user_name, function(error) {
+            return redis.sadd("user:" + callback.user_name, "Twitter", function(error) {
+              if (error) {
+                return console.log("Error: " + error);
+              }
+            });
           });
         }
-        return redis.hmset("user:" + cfg.TW_USERNAME + ":Twitter", "access_token", callback.oauth_access_token, "access_token_secret", callback.oauth_access_token_secret, function(error, reply) {
+        return redis.hmset("user:" + callback.user_name + ":Twitter", "access_token", callback.oauth_access_token, "access_token_secret", callback.oauth_access_token_secret, function(error, reply) {
           if (error) {
             return console.log("Error: " + error);
           } else {

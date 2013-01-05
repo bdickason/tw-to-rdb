@@ -53,13 +53,14 @@ app.get '/tw/login', (req, res) ->
 
 app.get '/tw/callback', (req, res) ->
   tw.handleCallback req.query.oauth_token, req.session.tw.oauth_token_secret, req.query.oauth_verifier, (callback) ->
-    redis.sismember "user:#{cfg.TW_USERNAME}", "Twitter", (error, reply) =>
+    redis.sismember "user:#{callback.user_name}", "Twitter", (error, reply) =>
       if reply != 1  # User hasn't auth'd with twitter before
-        console.log "adding Twitter account for user: #{cfg.TW_USERNAME}"
-        redis.sadd "user:#{cfg.TW_USERNAME}", "Twitter", (error) ->      
-          if error
-            console.log "Error: " + error
-      redis.hmset "user:#{cfg.TW_USERNAME}:Twitter", "access_token", callback.oauth_access_token, "access_token_secret", callback.oauth_access_token_secret, (error, reply) ->
+        console.log "adding new Twitter account for user: #{cfg.TW_USERNAME}"
+        redis.sadd "users", "user:#{callback.user_name}", (error) ->
+          redis.sadd "user:#{callback.user_name}", "Twitter", (error) ->      
+            if error
+              console.log "Error: " + error
+      redis.hmset "user:#{callback.user_name}:Twitter", "access_token", callback.oauth_access_token, "access_token_secret", callback.oauth_access_token_secret, (error, reply) ->
         if error
           console.log "Error: " + error
         else

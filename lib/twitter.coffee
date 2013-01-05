@@ -36,4 +36,4 @@ exports.Twitter = class Twitter
       if response is undefined
         console.log 'error: ' + response
 
-      callback { oauth_access_token, oauth_access_token_secret }
+      callback { oauth_access_token, oauth_access_token_secret, "user_name": response.screen_name }
