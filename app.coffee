@@ -58,15 +58,10 @@ app.get '/rdb/callback', (req, res) ->
           if error
             console.log "Error: " + error
       redis.hmset "user:#{cfg.TW_USERNAME}:Readability", "access_token", callback.oauth_access_token, "access_token_secret", callback.oauth_access_token_secret, (error, reply) ->
-        console.log error
-        console.log reply
         if error
           console.log "Error: " + error
         else
           res.send "<HTML><BODY><A HREF='/'>Home</A><BR /><BR /><STRONG>export RDB_ACCESS_TOKEN='#{callback.oauth_access_token}'<BR />export RDB_ACCESS_TOKEN_SECRET='#{callback.oauth_access_token_secret}'</strong><br /><br /><em>Hint: copy/paste this into ~/.profile</BODY></HTML>"
-    # req.session.oauth_access_token_secret = callback.oauth_access_token
-    # req.session.oauth_access_token_secret = callback.oauth_access_token_secret
-
   
 ### Support functions ###
 checkTweets = =>

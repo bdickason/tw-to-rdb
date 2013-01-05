@@ -87,8 +87,6 @@
           });
         }
         return redis.hmset("user:" + cfg.TW_USERNAME + ":Readability", "access_token", callback.oauth_access_token, "access_token_secret", callback.oauth_access_token_secret, function(error, reply) {
-          console.log(error);
-          console.log(reply);
           if (error) {
             return console.log("Error: " + error);
           } else {
