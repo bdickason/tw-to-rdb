@@ -25,7 +25,7 @@
 
   app.set('view engine', 'jade');
 
-  app.use(express["static"](__dirname + '/public'));
+  app.use(express["static"](__dirname + '/static'));
 
   app.use(express.session({
     store: new RedisStore({
@@ -54,8 +54,16 @@
 
 
   app.get('/', function(req, res) {
+    var user_name;
+    user_name = null;
+    if (req.session.tw) {
+      if (req.session.tw.user_name) {
+        user_name = req.session.tw.user_name;
+      }
+    }
     return res.render('index', {
-      "session": req.session
+      "session": req.session,
+      "user_name": user_name
     });
   });
 
@@ -72,6 +80,12 @@
 
   app.get('/tw', function(req, res) {
     return tw.getFavorites(20, function(callback) {
+      return res.send(callback);
+    });
+  });
+
+  app.get('/rdb', function(req, res) {
+    return rdb.getBookmarks(function(callback) {
       return res.send(callback);
     });
   });

@@ -11,7 +11,7 @@ app.use express.bodyParser()
 app.use express.cookieParser()
 app.set 'views', __dirname + '/views'
 app.set 'view engine', 'jade'
-app.use express.static __dirname + '/public'  
+app.use express.static __dirname + '/static'  
 
 app.use express.session
   store: new RedisStore # Populates req.session, req.sessionStore, req.sessionID
@@ -31,7 +31,11 @@ rdb = new Readability cfg, redis
 
 ### Routes ###      
 app.get '/', (req, res) ->
-  res.render 'index', { "session": req.session }
+  user_name = null
+  if req.session.tw
+    if req.session.tw.user_name
+      user_name = req.session.tw.user_name
+  res.render 'index', { "session": req.session, "user_name": user_name }
 
 app.get '/check', (req, res) ->
   # Check for new favorites, save to readability
@@ -47,12 +51,14 @@ app.get '/logout', (req, res) ->
 app.get '/tw', (req, res) ->
   tw.getFavorites 20, (callback) ->
     res.send callback
+
+app.get '/rdb', (req, res) ->
+  rdb.getBookmarks (callback) ->
+    res.send callback
   
 
 ### Readability Auth to retrieve access tokens, etc. ###
 app.get '/tw/login', (req, res) ->
-  
-  
   # Allow user to login using Twitter and collect request token
   tw.login (callback) ->
     # Store oauth_token + secret in session
