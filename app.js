@@ -124,7 +124,7 @@
           if (error) {
             return console.log("Error: " + error);
           } else {
-            return res.send("<HTML><BODY><A HREF='/'>Home</A><BR /><BR />                    <STRONG>export TW_ACCESS_TOKEN='" + callback.oauth_access_token + "'<BR />          export TW_ACCESS_TOKEN_SECRET='" + callback.oauth_access_token_secret + "'</strong><br /><br />                    <em>Hint: copy/paste this into ~/.profile          </BODY></HTML>");
+            return res.redirect('/');
           }
         });
       });
@@ -162,7 +162,7 @@
           if (error) {
             return console.log("Error: " + error);
           } else {
-            return res.send("<HTML><BODY>          <A HREF='/'>Home</A><BR /><BR />                    <STRONG>export RDB_ACCESS_TOKEN='" + callback.oauth_access_token + "'<BR />          export RDB_ACCESS_TOKEN_SECRET='" + callback.oauth_access_token_secret + "'</strong><br /><br />                    <em>Hint: copy/paste this into ~/.profile          </BODY></HTML>");
+            return res.redirect('/');
           }
         });
       });
