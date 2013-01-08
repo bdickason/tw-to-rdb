@@ -73,6 +73,8 @@
     return res.redirect('/');
   });
 
+  app.get('/status', function(req, res) {});
+
   app.get('/logout', function(req, res) {
     req.session.destroy();
     return res.redirect('/');
@@ -106,29 +108,34 @@
   });
 
   app.get('/tw/callback', function(req, res) {
-    return tw.handleCallback(req.query.oauth_token, req.session.tw.oauth_token_secret, req.query.oauth_verifier, function(callback) {
-      var _this = this;
-      req.session.tw.user_name = callback.user_name;
-      return redis.sismember("user:" + callback.user_name, "Twitter", function(error, reply) {
-        if (reply !== 1) {
-          console.log("adding new Twitter account for user: " + callback.user_name);
-          redis.sadd("users", "user:" + callback.user_name, function(error) {
-            return redis.sadd("user:" + callback.user_name, "Twitter", function(error) {
-              if (error) {
-                return console.log("Error: " + error);
-              }
+    if (req.query.denied) {
+      return res.redirect('/');
+    } else {
+      return tw.handleCallback(req.query.oauth_token, req.session.tw.oauth_token_secret, req.query.oauth_verifier, function(callback) {
+        var _this = this;
+        req.session.tw.user_name = callback.user_name;
+        return redis.sismember("user:" + callback.user_name, "Twitter", function(error, reply) {
+          if (reply !== 1) {
+            console.log("adding new Twitter account for user: " + callback.user_name);
+            redis.sadd("users", "user:" + callback.user_name, function(error) {
+              return redis.sadd("user:" + callback.user_name, "Twitter", function(error) {
+                if (error) {
+                  return console.log("Error: " + error);
+                }
+              });
             });
-          });
-        }
-        return redis.hmset("user:" + callback.user_name + ":Twitter", "access_token", callback.oauth_access_token, "access_token_secret", callback.oauth_access_token_secret, function(error, reply) {
-          if (error) {
-            return console.log("Error: " + error);
-          } else {
-            return res.redirect('/');
           }
+          return redis.hmset("user:" + callback.user_name + ":Twitter", "access_token", callback.oauth_access_token, "access_token_secret", callback.oauth_access_token_secret, "active", 1, function(error, reply) {
+            if (error) {
+              return console.log("Error: " + error);
+            } else {
+              req.session.tw.active = 1;
+              return res.redirect('/');
+            }
+          });
         });
       });
-    });
+    }
   });
 
   /* Readability Auth to retrieve access tokens, etc.
@@ -158,10 +165,11 @@
             }
           });
         }
-        return redis.hmset("user:" + cfg.TW_USERNAME + ":Readability", "access_token", callback.oauth_access_token, "access_token_secret", callback.oauth_access_token_secret, function(error, reply) {
+        return redis.hmset("user:" + cfg.TW_USERNAME + ":Readability", "access_token", callback.oauth_access_token, "access_token_secret", callback.oauth_access_token_secret, "active", 1, function(error, reply) {
           if (error) {
             return console.log("Error: " + error);
           } else {
+            req.session.tw.active = 1;
             return res.redirect('/');
           }
         });
@@ -204,7 +212,7 @@
   */
 
 
-  app.listen('3000');
+  app.listen("" + cfg.PORT);
 
   /*
   # Trigger the loop to run every 4.01 mins. (Twitter rate limit is 15x/1hr aka every 4 minutes)

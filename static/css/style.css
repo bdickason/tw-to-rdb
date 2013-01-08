@@ -17,6 +17,11 @@ a {
   word-wrap: break-word;
 }
 
+.disabled {
+  cursor: not-allowed;
+  background-color: #EEE;
+  color: #555;
+}
 
 /* Homepage */
 

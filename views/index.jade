@@ -22,7 +22,10 @@ html(lang="en")
             else
               a(href='/tw/login') Sign In with Twitter
           p 
-            a(href='/rdb/login') Sign In with Readability
+            if user_name
+              a(href='/rdb/login') Sign In with Readability
+            else
+              a(href='#', class=(user_name === null ? 'disabled': "")) Sign In with Readability
 
       #debug
         p Session: 

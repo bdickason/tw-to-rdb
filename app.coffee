@@ -42,6 +42,10 @@ app.get '/check', (req, res) ->
   checkTweets()
   console.log "Checking Tweets"
   res.redirect '/'
+  
+app.get '/status', (req, res) ->
+  # Admin debug screen to show all active timers
+  
     
 app.get '/logout', (req, res) ->
   # Allow the user to logout (clear local session)
@@ -69,20 +73,25 @@ app.get '/tw/login', (req, res) ->
     res.redirect "https://api.twitter.com/oauth/authenticate?oauth_token=#{callback.oauth_token}&oauth_token_secret=#{callback.oauth_token_secret}"
 
 app.get '/tw/callback', (req, res) ->
-  tw.handleCallback req.query.oauth_token, req.session.tw.oauth_token_secret, req.query.oauth_verifier, (callback) ->
-    req.session.tw.user_name = callback.user_name
-    redis.sismember "user:#{callback.user_name}", "Twitter", (error, reply) =>
-      if reply != 1  # User hasn't auth'd with twitter before
-        console.log "adding new Twitter account for user: #{callback.user_name}"
-        redis.sadd "users", "user:#{callback.user_name}", (error) =>
-          redis.sadd "user:#{callback.user_name}", "Twitter", (error) =>      
-            if error
-              console.log "Error: " + error
-      redis.hmset "user:#{callback.user_name}:Twitter", "access_token", callback.oauth_access_token, "access_token_secret", callback.oauth_access_token_secret, (error, reply) ->
-        if error
-          console.log "Error: " + error
-        else
-          res.redirect '/'
+  if req.query.denied
+    # Twitter denied auth or user hit cancel
+    res.redirect '/'
+  else    
+    tw.handleCallback req.query.oauth_token, req.session.tw.oauth_token_secret, req.query.oauth_verifier, (callback) ->
+      req.session.tw.user_name = callback.user_name
+      redis.sismember "user:#{callback.user_name}", "Twitter", (error, reply) =>
+        if reply != 1  # User hasn't auth'd with twitter before
+          console.log "adding new Twitter account for user: #{callback.user_name}"
+          redis.sadd "users", "user:#{callback.user_name}", (error) =>
+            redis.sadd "user:#{callback.user_name}", "Twitter", (error) =>      
+              if error
+                console.log "Error: " + error
+        redis.hmset "user:#{callback.user_name}:Twitter", "access_token", callback.oauth_access_token, "access_token_secret", callback.oauth_access_token_secret, "active", 1, (error, reply) ->
+          if error
+            console.log "Error: " + error
+          else
+            req.session.tw.active = 1
+            res.redirect '/'
 
 ### Readability Auth to retrieve access tokens, etc. ###
 app.get '/rdb/login', (req, res) ->
@@ -104,14 +113,15 @@ app.get '/rdb/callback', (req, res) ->
         redis.sadd "user:#{cfg.TW_USERNAME}", "Readability", (error) ->      
           if error
             console.log "Error: " + error
-      redis.hmset "user:#{cfg.TW_USERNAME}:Readability", "access_token", callback.oauth_access_token, "access_token_secret", callback.oauth_access_token_secret, (error, reply) ->
+      redis.hmset "user:#{cfg.TW_USERNAME}:Readability", "access_token", callback.oauth_access_token, "access_token_secret", callback.oauth_access_token_secret, "active", 1, (error, reply) ->
         if error
           console.log "Error: " + error
         else
+          req.session.tw.active = 1
           res.redirect '/'
   
 ### Support functions ###
-checkTweets = (callback) =>
+checkTweets = user_name, (callback) =>
   count = 10  # Check last 10 tweets by default
 
   tw.getFavorites count, (callback) ->
@@ -122,7 +132,7 @@ checkTweets = (callback) =>
           rdb.addBookmark { url: url.expanded_url }, (cb) ->      
       
 ### Start the App ###
-app.listen '3000'
+app.listen "#{cfg.PORT}"
 
 # checkTweets -> # Run once immediately
 
