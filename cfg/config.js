@@ -20,4 +20,8 @@
 
   exports.REDIS_HOSTNAME = process.env.REDIS_HOSTNAME || 'localhost';
 
+  exports.HOSTNAME = process.env.HOSTNAME || 'localhost';
+
+  exports.PORT = process.env.PORT || '3000';
+
 }).call(this);

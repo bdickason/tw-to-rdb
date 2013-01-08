@@ -7,8 +7,9 @@ exports.Twitter = class Twitter
     @redis = redis
   
     # Generate oauth object
-    @oa = oa = new OAuth 'https://api.twitter.com/oauth/request_token', 'https://api.twitter.com/oauth/access_token', @cfg.TW_CONSUMER_KEY, @cfg.TW_CONSUMER_SECRET, '1.0', 'http://localhost:3000/tw/callback', 'HMAC-SHA1'
+    @oa = oa = new OAuth 'https://api.twitter.com/oauth/request_token', 'https://api.twitter.com/oauth/access_token', @cfg.TW_CONSUMER_KEY, @cfg.TW_CONSUMER_SECRET, '1.0', "http://#{@cfg.HOSTNAME}:#{@cfg.PORT}/tw/callback", 'HMAC-SHA1'
     
+    console.log 
   getFavorites: (count, callback) ->
     
     @redis.hgetall "user:#{@cfg.TW_USERNAME}:Twitter", (error, reply) =>

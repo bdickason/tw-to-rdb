@@ -13,3 +13,7 @@ exports.RDB_CONSUMER_SECRET = process.env.RDB_CONSUMER_SECRET || ''
 # Redis Setup
 exports.REDIS_PORT = process.env.REDIS_PORT || '6379'
 exports.REDIS_HOSTNAME = process.env.REDIS_HOSTNAME || 'localhost'
+
+# Server Setup
+exports.HOSTNAME = process.env.HOSTNAME || 'localhost'
+exports.PORT = process.env.PORT || '3000'
