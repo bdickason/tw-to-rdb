@@ -10,7 +10,7 @@ Todo
 * ~~Save favorite to 'Last Favorite'~~
 * ~~Automate it~~
 * ~~Implement persistent storage (redis)~~
-* Deploy to live server
+* ~~Deploy to live server~~
 * Allow multiple users
 * Create web interface to auth twitter
 * Create web interface to auth readability
