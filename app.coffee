@@ -39,7 +39,7 @@ app.get '/', (req, res) ->
 
 app.get '/check', (req, res) ->
   # Check for new favorites, save to readability
-  checkTweets()
+  checkTweets(req.session.tw.user_name)
   console.log "Checking Tweets"
   res.redirect '/'
   
@@ -53,7 +53,7 @@ app.get '/logout', (req, res) ->
   res.redirect '/'  
 
 app.get '/tw', (req, res) ->
-  tw.getFavorites 20, (callback) ->
+  tw.getFavorites req.session.tw.user_name, 20, (callback) ->
     res.send callback
 
 app.get '/rdb', (req, res) ->
@@ -121,10 +121,10 @@ app.get '/rdb/callback', (req, res) ->
           res.redirect '/'
   
 ### Support functions ###
-checkTweets = user_name, (callback) =>
+checkTweets = (user_name, callback) =>
   count = 10  # Check last 10 tweets by default
 
-  tw.getFavorites count, (callback) ->
+  tw.getFavorites user_name, count, (callback) ->
     if callback.length > 0
       # There are tweets!
       for tweet in callback

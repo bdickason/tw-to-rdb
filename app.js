@@ -68,7 +68,7 @@
   });
 
   app.get('/check', function(req, res) {
-    checkTweets();
+    checkTweets(req.session.tw.user_name);
     console.log("Checking Tweets");
     return res.redirect('/');
   });
@@ -81,7 +81,7 @@
   });
 
   app.get('/tw', function(req, res) {
-    return tw.getFavorites(20, function(callback) {
+    return tw.getFavorites(req.session.tw.user_name, 20, function(callback) {
       return res.send(callback);
     });
   });
@@ -181,10 +181,10 @@
   */
 
 
-  checkTweets = function(callback) {
+  checkTweets = function(user_name, callback) {
     var count;
     count = 10;
-    return tw.getFavorites(count, function(callback) {
+    return tw.getFavorites(user_name, count, function(callback) {
       var tweet, url, _i, _len, _results;
       if (callback.length > 0) {
         _results = [];
