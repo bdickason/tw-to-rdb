@@ -2,16 +2,16 @@
 OAuth = (require 'oauth').OAuth
 
 exports.Readability = class Readability
-  constructor: (cfg, redis) ->
+  constructor: (cfg, db) ->
     @cfg = cfg  # Save config values
-    @redis = redis
+    @db = db
     
     # Generate oauth object
     @oa = oa = new OAuth 'https://www.readability.com/api/rest/v1/oauth/request_token/', 'https://www.readability.com/api/rest/v1/oauth/access_token/', @cfg.RDB_CONSUMER_KEY, @cfg.RDB_CONSUMER_SECRET, '1.0', "http://#{@cfg.HOSTNAME}:#{@cfg.PORT}/rdb/callback", 'HMAC-SHA1'
 
   
   getBookmarks: (user_name, callback) ->
-    @redis.hgetall "user:#{user_name}:Readability", (error, reply) =>
+    @db.redis.hgetall "user:#{user_name}:Readability", (error, reply) =>
       if error
         console.log error
       else
@@ -23,7 +23,7 @@ exports.Readability = class Readability
             callback data
 
   addBookmark: (user_name, item, callback) ->
-    @redis.hgetall "user:#{user_name}:Readability", (error, reply) =>
+    @db.redis.hgetall "user:#{user_name}:Readability", (error, reply) =>
       if error
         console.log error
       else

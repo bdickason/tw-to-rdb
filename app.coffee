@@ -2,8 +2,8 @@ express = require 'express'
 cfg = require './cfg/config.js'
 Twitter = (require './lib/twitter.js').Twitter
 Readability = (require './lib/readability.js').Readability
+Db = (require './lib/db.js').Db
 
-Redis = require 'redis'
 RedisStore = (require 'connect-redis')(express)
 
 app = express()
@@ -19,15 +19,12 @@ app.use express.session
     maxAge: 1209600000 # 14 day max age
   secret: 'blahblahblah'  # Random hash for session store
 
-# Start up redis
-redis = Redis.createClient cfg.REDIS_PORT, cfg.REDIS_HOSTNAME
-redis.on 'error', (err) ->
-  console.log 'REDIS Error:' + err
 
 
 ### Controllers ###
-tw = new Twitter cfg, redis
-rdb = new Readability cfg, redis
+db = new Db cfg
+tw = new Twitter cfg, db
+rdb = new Readability cfg, db
 
 ### Routes ###      
 app.get '/', (req, res) ->
@@ -79,14 +76,14 @@ app.get '/tw/callback', (req, res) ->
   else    
     tw.handleCallback req.query.oauth_token, req.session.tw.oauth_token_secret, req.query.oauth_verifier, (callback) ->
       req.session.tw.user_name = callback.user_name
-      redis.sismember "user:#{callback.user_name}", "Twitter", (error, reply) =>
+      db.redis.sismember "user:#{callback.user_name}", "Twitter", (error, reply) =>
         if reply != 1  # User hasn't auth'd with twitter before
           console.log "adding new Twitter account for user: #{callback.user_name}"
-          redis.sadd "users", "user:#{callback.user_name}", (error) =>
-            redis.sadd "user:#{callback.user_name}", "Twitter", (error) =>      
+          db.redis.sadd "users", "user:#{callback.user_name}", (error) =>
+            db.redis.sadd "user:#{callback.user_name}", "Twitter", (error) =>      
               if error
                 console.log "Error: " + error
-        redis.hmset "user:#{callback.user_name}:Twitter", "access_token", callback.oauth_access_token, "access_token_secret", callback.oauth_access_token_secret, "active", 1, (error, reply) ->
+        db.redis.hmset "user:#{callback.user_name}:Twitter", "access_token", callback.oauth_access_token, "access_token_secret", callback.oauth_access_token_secret, "active", 1, (error, reply) ->
           if error
             console.log "Error: " + error
           else
@@ -107,13 +104,13 @@ app.get '/rdb/login', (req, res) ->
 
 app.get '/rdb/callback', (req, res) ->
   rdb.handleCallback req.query.oauth_token, req.session.rdb.oauth_token_secret, req.query.oauth_verifier, (callback) ->
-    redis.sismember "user:#{cfg.TW_USERNAME}", "Readability", (error, reply) =>
+    db.redis.sismember "user:#{cfg.TW_USERNAME}", "Readability", (error, reply) =>
       if reply != 1  # User hasn't auth'd with readability before
         console.log "adding Readability account for user: #{cfg.TW_USERNAME}"
-        redis.sadd "user:#{cfg.TW_USERNAME}", "Readability", (error) ->      
+        db.redis.sadd "user:#{cfg.TW_USERNAME}", "Readability", (error) ->      
           if error
             console.log "Error: " + error
-      redis.hmset "user:#{cfg.TW_USERNAME}:Readability", "access_token", callback.oauth_access_token, "access_token_secret", callback.oauth_access_token_secret, "active", 1, (error, reply) ->
+      db.redis.hmset "user:#{cfg.TW_USERNAME}:Readability", "access_token", callback.oauth_access_token, "access_token_secret", callback.oauth_access_token_secret, "active", 1, (error, reply) ->
         if error
           console.log "Error: " + error
         else
