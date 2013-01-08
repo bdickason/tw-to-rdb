@@ -14,7 +14,7 @@ redis.on 'error', (err) ->
 rdb = new Readability cfg, redis
 
 
-
+### Having issues with jenkins configuration
 describe 'Readability connection', ->
   it 'Can retrieve your bookmarks', (done) ->
     rdb.getBookmarks (callback) ->
@@ -27,3 +27,5 @@ describe 'Readability connection', ->
     
     rdb.addBookmark item, (callback) ->
       done()
+      
+###
