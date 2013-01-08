@@ -83,7 +83,7 @@
   });
 
   app.get('/rdb', function(req, res) {
-    return rdb.getBookmarks(function(callback) {
+    return rdb.getBookmarks(req.session.tw.user_name, function(callback) {
       return res.send(callback);
     });
   });

@@ -10,14 +10,14 @@ exports.Twitter = class Twitter
     @oa = oa = new OAuth 'https://api.twitter.com/oauth/request_token', 'https://api.twitter.com/oauth/access_token', @cfg.TW_CONSUMER_KEY, @cfg.TW_CONSUMER_SECRET, '1.0', "http://#{@cfg.HOSTNAME}:#{@cfg.PORT}/tw/callback", 'HMAC-SHA1'
     
   getFavorites: (user_name, count, callback) ->
-    console.log user_name
-    @db.redis.hgetall "user:#{user_name}:Twitter", (error, reply) =>
+    @db.getAccessTokens user_name, "Twitter", (error, reply) =>
       console.log reply
       if error
         console.log error
       else
         @oa.getProtectedResource 'https://api.twitter.com/1.1/favorites/list.json?count=#{count}', 'GET', reply.access_token, reply.access_token_secret, (error, data, response) ->
           if error
+            console.log error
             callback 'Error: getting OAuth resource: ' + error
           else
             callback JSON.parse data

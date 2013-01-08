@@ -54,7 +54,7 @@ app.get '/tw', (req, res) ->
     res.send callback
 
 app.get '/rdb', (req, res) ->
-  rdb.getBookmarks (callback) ->
+  rdb.getBookmarks req.session.tw.user_name, (callback) ->
     res.send callback
   
 

@@ -9,12 +9,11 @@ exports.Readability = class Readability
     # Generate oauth object
     @oa = oa = new OAuth 'https://www.readability.com/api/rest/v1/oauth/request_token/', 'https://www.readability.com/api/rest/v1/oauth/access_token/', @cfg.RDB_CONSUMER_KEY, @cfg.RDB_CONSUMER_SECRET, '1.0', "http://#{@cfg.HOSTNAME}:#{@cfg.PORT}/rdb/callback", 'HMAC-SHA1'
 
-  
   getBookmarks: (user_name, callback) ->
-    @db.redis.hgetall "user:#{user_name}:Readability", (error, reply) =>
+    @db.getAccessTokens user_name, "Readability", (error, reply) =>
       if error
         console.log error
-      else
+      else 
         @oa.getProtectedResource 'https://www.readability.com/api/rest/v1/bookmarks', 'GET', reply.access_token, reply.access_token_secret, (error, data, response) ->
           if error
             console.log error
@@ -23,7 +22,7 @@ exports.Readability = class Readability
             callback data
 
   addBookmark: (user_name, item, callback) ->
-    @db.redis.hgetall "user:#{user_name}:Readability", (error, reply) =>
+    @db.getAccessTokens user_name, "Readability", (error, reply) =>
       if error
         console.log error
       else
