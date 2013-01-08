@@ -123,13 +123,12 @@ app.get '/rdb/callback', (req, res) ->
 ### Support functions ###
 checkTweets = (user_name, callback) =>
   count = 10  # Check last 10 tweets by default
-
   tw.getFavorites user_name, count, (callback) ->
     if callback.length > 0
       # There are tweets!
       for tweet in callback
         for url in tweet.entities.urls # Twitter creates an array of url's that have additional metadata
-          rdb.addBookmark { url: url.expanded_url }, (cb) ->      
+          rdb.addBookmark user_name, { url: url.expanded_url }, (cb) ->      
       
 ### Start the App ###
 app.listen "#{cfg.PORT}"
@@ -137,8 +136,8 @@ app.listen "#{cfg.PORT}"
 # checkTweets -> # Run once immediately
 
 ###
-# Trigger the loop to run every 4.01 mins. (Twitter rate limit is 15x/1hr aka every 4 minutes)
+# Trigger the loop to run every 4.01 mins. (Twitter rate limit is 1x/min)
 setInterval ->
   checkTweets
-, 240000 # Run every 4 minutes aka 240,000ms
+, 70000 # Run every 1.17 minutes aka 70,000ms
 ###

@@ -196,7 +196,7 @@
             _results1 = [];
             for (_j = 0, _len1 = _ref.length; _j < _len1; _j++) {
               url = _ref[_j];
-              _results1.push(rdb.addBookmark({
+              _results1.push(rdb.addBookmark(user_name, {
                 url: url.expanded_url
               }, function(cb) {}));
             }
@@ -215,10 +215,10 @@
   app.listen("" + cfg.PORT);
 
   /*
-  # Trigger the loop to run every 4.01 mins. (Twitter rate limit is 15x/1hr aka every 4 minutes)
+  # Trigger the loop to run every 4.01 mins. (Twitter rate limit is 1x/min)
   setInterval ->
     checkTweets
-  , 240000 # Run every 4 minutes aka 240,000ms
+  , 70000 # Run every 1.17 minutes aka 70,000ms
   */
 
 
