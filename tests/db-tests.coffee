@@ -21,3 +21,9 @@ describe 'Redis is running', ->
       data.should.equal testValue
       done()
 
+
+describe 'Access Tokens', ->
+  # it 'Should be able to set an access token', (done) ->
+    
+  # it 'Should be able to get the access token we set', (done) ->
+    
