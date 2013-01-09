@@ -5,12 +5,13 @@ exports.Twitter = class Twitter
   constructor: (cfg, db) ->
     @cfg = cfg
     @db = db
+    @appname = "Twitter"
   
     # Generate oauth object
     @oa = oa = new OAuth 'https://api.twitter.com/oauth/request_token', 'https://api.twitter.com/oauth/access_token', @cfg.TW_CONSUMER_KEY, @cfg.TW_CONSUMER_SECRET, '1.0', "http://#{@cfg.HOSTNAME}:#{@cfg.PORT}/tw/callback", 'HMAC-SHA1'
     
   getFavorites: (user_name, count, callback) ->
-    @db.getAccessTokens user_name, "Twitter", (error, reply) =>
+    @db.getAccessTokens user_name, @appname, (error, reply) =>
       console.log reply
       if error
         console.log error
@@ -40,13 +41,13 @@ exports.Twitter = class Twitter
 
       user_name = response.screen_name
 
-      @db.doesAccountExist user_name, "Twitter", (error, reply) =>
+      @db.doesAccountExist user_name, @appname, (error, reply) =>
         if reply != 1  # User hasn't auth'd with twitter before
-          console.log "adding new Twitter account for user: #{user_name}"
-          @db.createAccount user_name, "Twitter", (error) =>
+          console.log "adding new #{@appname} account for user: #{user_name}"
+          @db.createAccount user_name, @appname, (error) =>
             if error
               console.log "Error: " + error 
-        @db.setAccessTokens user_name, "Twitter", oauth_access_token, oauth_access_token_secret, (error, reply) =>
+        @db.setAccessTokens user_name, @appname, oauth_access_token, oauth_access_token_secret, (error, reply) =>
           if error
             console.log "Error: " + error
           callback error, { oauth_access_token, oauth_access_token_secret, "user_name": user_name }

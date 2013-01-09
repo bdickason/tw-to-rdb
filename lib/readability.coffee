@@ -5,12 +5,13 @@ exports.Readability = class Readability
   constructor: (cfg, db) ->
     @cfg = cfg  # Save config values
     @db = db
+    @appname = "Readability"
     
     # Generate oauth object
     @oa = oa = new OAuth 'https://www.readability.com/api/rest/v1/oauth/request_token/', 'https://www.readability.com/api/rest/v1/oauth/access_token/', @cfg.RDB_CONSUMER_KEY, @cfg.RDB_CONSUMER_SECRET, '1.0', "http://#{@cfg.HOSTNAME}:#{@cfg.PORT}/rdb/callback", 'HMAC-SHA1'
 
   getBookmarks: (user_name, callback) ->
-    @db.getAccessTokens user_name, "Readability", (error, reply) =>
+    @db.getAccessTokens user_name, @appname, (error, reply) =>
       if error
         console.log error
       else 
@@ -22,7 +23,7 @@ exports.Readability = class Readability
             callback data
 
   addBookmark: (user_name, item, callback) ->
-    @db.getAccessTokens user_name, "Readability", (error, reply) =>
+    @db.getAccessTokens user_name, @appname, (error, reply) =>
       if error
         console.log error
       else
@@ -49,22 +50,21 @@ exports.Readability = class Readability
 
         callback { oauth_token, oauth_token_secret }
 
-    handleCallback: (user_name, oauth_token, oauth_token_secret, oauth_verifier, callback) ->
-      # We use twitter usernames to identify users (user_name)
-      # Grab Access Token
-      @oa.getOAuthAccessToken oauth_token, oauth_token_secret, oauth_verifier, (error, oauth_access_token, oauth_access_token_secret, response) =>
-        if error
-          console.log 'error :' + JSON.stringify error
-        if !response
-          console.log 'error: ' + response
-
-        @db.doesAccountExist user_name, "Readability", (error, reply) =>
-          if reply != 1  # User hasn't auth'd with twitter before
-            console.log "adding new Readability account for user: #{user_name}"
-            @db.createAccount user_name, "Readability", (error) =>
-              if error
-                console.log "Error: " + error 
-          @db.setAccessTokens user_name, "Readability", oauth_access_token, oauth_access_token_secret, (error, reply) =>
+  handleCallback: (user_name, oauth_token, oauth_token_secret, oauth_verifier, callback) =>
+    # We use twitter usernames to identify users (user_name)
+    # Grab Access Token
+    @oa.getOAuthAccessToken oauth_token, oauth_token_secret, oauth_verifier, (error, oauth_access_token, oauth_access_token_secret, response) =>
+      if error
+        console.log 'error :' + JSON.stringify error
+      if !response
+        console.log 'error: ' + response
+      @db.doesAccountExist user_name, @appname, (error, reply) =>
+        if reply != 1  # User hasn't auth'd with twitter before
+          console.log "adding new #{@appname} account for user: #{user_name}"          
+          @db.createAccount user_name, @appname, (error) =>
             if error
-              console.log "Error: " + error
-            callback error, { oauth_access_token, oauth_access_token_secret }
+              console.log "Error: " + error 
+        @db.setAccessTokens user_name, @appname, oauth_access_token, oauth_access_token_secret, (error, reply) =>
+          if error
+            console.log "Error: " + error
+          callback error, { oauth_access_token, oauth_access_token_secret }
