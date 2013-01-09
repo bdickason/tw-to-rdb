@@ -32,11 +32,32 @@
   });
 
   describe('Access Tokens', function() {
-    var testAccessToken, testAccessTokenSecret, testApp, testUsername;
+    var testAccessToken, testAccessTokenSecret, testApp, testUsername, testUsernameNew;
     testUsername = 'tester';
+    testUsernameNew = 'tester2';
     testApp = 'TestApp';
     testAccessToken = '1234567890abcdef';
     testAccessTokenSecret = 'fedcba0987654321';
+    it('Should be able to create a new account', function(done) {
+      return db.createAccount(testUsername, testApp, function(error, reply) {
+        should.not.exist.error;
+        return done();
+      });
+    });
+    it('Should be able to check if an existing account exists in the db', function(done) {
+      return db.doesAccountExist(testUsername, testApp, function(error, reply) {
+        should.not.exist.error;
+        reply.should.equal(1);
+        return done();
+      });
+    });
+    it('Should be able to check if a new account exists in the db', function(done) {
+      return db.doesAccountExist(testUsernameNew, testApp, function(error, reply) {
+        should.not.exist.error;
+        reply.should.equal(0);
+        return done();
+      });
+    });
     it('Should be able to set an access token', function(done) {
       return db.setAccessTokens(testUsername, testApp, testAccessToken, testAccessTokenSecret, function(error, reply) {
         should.not.exist(error);

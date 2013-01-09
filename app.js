@@ -107,18 +107,16 @@
     if (req.query.denied) {
       return res.redirect('/');
     } else {
-      return tw.handleCallback(req.query.oauth_token, req.session.tw.oauth_token_secret, req.query.oauth_verifier, function(callback) {
+      return tw.handleCallback(req.query.oauth_token, req.query.oauth_token_secret, req.query.oauth_verifier, function(callback) {
         var _this = this;
         req.session.tw.user_name = callback.user_name;
-        return db.redis.sismember("user:" + callback.user_name, "Twitter", function(error, reply) {
+        return db.doesAccountExist(req.session.tw.user_name, "Twitter", function(error, reply) {
           if (reply !== 1) {
-            console.log("adding new Twitter account for user: " + callback.user_name);
-            db.redis.sadd("users", "user:" + callback.user_name, function(error) {
-              return db.redis.sadd("user:" + callback.user_name, "Twitter", function(error) {
-                if (error) {
-                  return console.log("Error: " + error);
-                }
-              });
+            console.log("adding new Twitter account for user: " + req.session.tw.user_name);
+            db.createAccount(req.session.tw.user_name, "Twitter", function(error) {
+              if (error) {
+                return console.log("Error: " + error);
+              }
             });
           }
           return db.setAccessTokens(req.session.tw.user_name, "Twitter", callback.oauth_access_token, callback.oauth_access_token_secret, function(error, reply) {
@@ -153,10 +151,10 @@
   app.get('/rdb/callback', function(req, res) {
     return rdb.handleCallback(req.query.oauth_token, req.session.rdb.oauth_token_secret, req.query.oauth_verifier, function(callback) {
       var _this = this;
-      return db.redis.sismember("user:" + cfg.TW_USERNAME, "Readability", function(error, reply) {
+      return db.doesAccountExist(req.session.tw.user_name, "Readability", function(error, reply) {
         if (reply !== 1) {
-          console.log("adding Readability account for user: " + cfg.TW_USERNAME);
-          db.redis.sadd("user:" + cfg.TW_USERNAME, "Readability", function(error) {
+          console.log("adding new Readability account for user: " + req.session.tw.user_name);
+          db.createAccount(req.session.tw.user_name, "Readability", function(error) {
             if (error) {
               return console.log("Error: " + error);
             }
@@ -166,7 +164,7 @@
           if (error) {
             return console.log("Error: " + error);
           } else {
-            req.session.tw.active = 1;
+            req.session.rdb.active = 1;
             return res.redirect('/');
           }
         });

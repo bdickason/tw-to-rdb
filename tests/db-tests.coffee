@@ -27,10 +27,28 @@ describe 'Access Tokens', ->
   
   # Stub data
   testUsername = 'tester'
+  testUsernameNew = 'tester2'
   testApp = 'TestApp'
   testAccessToken = '1234567890abcdef'
   testAccessTokenSecret = 'fedcba0987654321'
-  
+
+  it 'Should be able to create a new account', (done) ->
+    db.createAccount testUsername, testApp, (error, reply) ->
+      should.not.exist.error
+      done()
+
+  it 'Should be able to check if an existing account exists in the db', (done) ->
+    db.doesAccountExist testUsername, testApp, (error, reply) ->
+      should.not.exist.error
+      reply.should.equal 1
+      done()
+      
+  it 'Should be able to check if a new account exists in the db', (done) ->
+    db.doesAccountExist testUsernameNew, testApp, (error, reply) ->
+      should.not.exist.error
+      reply.should.equal 0
+      done()  
+        
   it 'Should be able to set an access token', (done) ->
     db.setAccessTokens testUsername, testApp, testAccessToken, testAccessTokenSecret, (error, reply) ->
       should.not.exist error
@@ -43,3 +61,4 @@ describe 'Access Tokens', ->
       reply.access_token_secret.should.equal testAccessTokenSecret
       reply.active.should.equal '1'
       done()
+      

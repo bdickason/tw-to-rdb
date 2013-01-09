@@ -74,15 +74,14 @@ app.get '/tw/callback', (req, res) ->
     # Twitter denied auth or user hit cancel
     res.redirect '/'
   else    
-    tw.handleCallback req.query.oauth_token, req.session.tw.oauth_token_secret, req.query.oauth_verifier, (callback) ->
+    tw.handleCallback req.query.oauth_token, req.query.oauth_token_secret, req.query.oauth_verifier, (callback) ->
       req.session.tw.user_name = callback.user_name
-      db.redis.sismember "user:#{callback.user_name}", "Twitter", (error, reply) =>
+      db.doesAccountExist req.session.tw.user_name, "Twitter", (error, reply) =>
         if reply != 1  # User hasn't auth'd with twitter before
-          console.log "adding new Twitter account for user: #{callback.user_name}"
-          db.redis.sadd "users", "user:#{callback.user_name}", (error) =>
-            db.redis.sadd "user:#{callback.user_name}", "Twitter", (error) =>      
-              if error
-                console.log "Error: " + error 
+          console.log "adding new Twitter account for user: #{req.session.tw.user_name}"
+          db.createAccount req.session.tw.user_name, "Twitter", (error) =>
+            if error
+              console.log "Error: " + error 
         db.setAccessTokens req.session.tw.user_name, "Twitter", callback.oauth_access_token, callback.oauth_access_token_secret, (error, reply) =>
           if error
             console.log "Error: " + error
@@ -105,17 +104,17 @@ app.get '/rdb/login', (req, res) ->
 
 app.get '/rdb/callback', (req, res) ->
   rdb.handleCallback req.query.oauth_token, req.session.rdb.oauth_token_secret, req.query.oauth_verifier, (callback) ->
-    db.redis.sismember "user:#{cfg.TW_USERNAME}", "Readability", (error, reply) =>
-      if reply != 1  # User hasn't auth'd with readability before
-        console.log "adding Readability account for user: #{cfg.TW_USERNAME}"
-        db.redis.sadd "user:#{cfg.TW_USERNAME}", "Readability", (error) ->      
+    db.doesAccountExist req.session.tw.user_name, "Readability", (error, reply) =>
+      if reply != 1  # User hasn't auth'd with Readability before
+        console.log "adding new Readability account for user: #{req.session.tw.user_name}"
+        db.createAccount req.session.tw.user_name, "Readability", (error) =>
           if error
             console.log "Error: " + error
       db.setAccessTokens req.session.tw.user_name, "Readability", callback.oauth_access_token, callback.oauth_access_token_secret, (error, reply) =>
         if error
           console.log "Error: " + error
         else
-          req.session.tw.active = 1
+          req.session.rdb.active = 1
           res.redirect '/'
   
 ### Support functions ###

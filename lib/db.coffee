@@ -8,9 +8,9 @@ exports.Db = class Db
     @redis.on 'error', (err) ->
       console.log 'REDIS Error:' + err
 
+  
   setAccessTokens: (user_name, app_name, access_token, access_token_secret, callback) ->
     if user_name and app_name
-      console.log "user:#{user_name}:#{app_name}"
       @redis.hmset "user:#{user_name}:#{app_name}", "access_token", access_token, "access_token_secret", access_token_secret, "active", 1, (error, reply) ->
         callback error, reply
     else
@@ -24,5 +24,28 @@ exports.Db = class Db
       @redis.hgetall "user:#{user_name}:#{app_name}", (error, reply) =>
         callback error, reply
     else
-      callback "Error."
+      if !user_name
+        callback "Error: User Name not set"
+      else if !app_name
+        callback "Error: App Name not set"
       
+  doesAccountExist: (user_name, app_name, callback) ->
+    if user_name and app_name
+      @redis.sismember "user:#{user_name}", app_name, (error, reply) =>
+        callback error, reply
+    else
+      if !user_name
+        callback "Error: User Name not set"
+      else if !app_name
+        callback "Error: App Name not set"        
+  
+  createAccount: (user_name, app_name, callback) ->
+    if user_name and app_name
+      @redis.sadd "users", "user:#{user_name}", (error, reply) =>
+        @redis.sadd "user:#{user_name}", app_name, (error, reply) =>
+          callback error, reply
+    else
+      if !user_name
+        callback "Error: User Name not set"
+      else if !app_name
+        callback "Error: App Name not set"        
