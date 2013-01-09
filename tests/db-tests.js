@@ -23,14 +23,35 @@
       return db.redis.set(testKey, testValue, done);
     });
     return it('Should be able to get the string we set', function(done) {
-      return db.redis.get(testKey, function(err, data) {
-        should.not.exist(err);
+      return db.redis.get(testKey, function(error, data) {
+        should.not.exist(error);
         data.should.equal(testValue);
         return done();
       });
     });
   });
 
-  describe('Access Tokens', function() {});
+  describe('Access Tokens', function() {
+    var testAccessToken, testAccessTokenSecret, testApp, testUsername;
+    testUsername = 'tester';
+    testApp = 'TestApp';
+    testAccessToken = '1234567890abcdef';
+    testAccessTokenSecret = 'fedcba0987654321';
+    it('Should be able to set an access token', function(done) {
+      return db.setAccessTokens(testUsername, testApp, testAccessToken, testAccessTokenSecret, function(error, reply) {
+        should.not.exist(error);
+        return done();
+      });
+    });
+    return it('Should be able to get the access token we set', function(done) {
+      return db.getAccessTokens(testUsername, testApp, function(error, reply) {
+        should.not.exist.error;
+        reply.access_token.should.equal(testAccessToken);
+        reply.access_token_secret.should.equal(testAccessTokenSecret);
+        reply.active.should.equal('1');
+        return done();
+      });
+    });
+  });
 
 }).call(this);
