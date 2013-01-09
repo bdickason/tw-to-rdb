@@ -82,8 +82,8 @@ app.get '/tw/callback', (req, res) ->
           db.redis.sadd "users", "user:#{callback.user_name}", (error) =>
             db.redis.sadd "user:#{callback.user_name}", "Twitter", (error) =>      
               if error
-                console.log "Error: " + error
-        db.setAccessTokens req.session.tw.user_name, "Readability", callback.oauth_access_token, callback.oauth_access_token_secret, (error, reply) =>
+                console.log "Error: " + error 
+        db.setAccessTokens req.session.tw.user_name, "Twitter", callback.oauth_access_token, callback.oauth_access_token_secret, (error, reply) =>
           if error
             console.log "Error: " + error
           else

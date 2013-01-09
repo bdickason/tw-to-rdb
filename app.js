@@ -121,7 +121,7 @@
               });
             });
           }
-          return db.setAccessTokens(req.session.tw.user_name, "Readability", callback.oauth_access_token, callback.oauth_access_token_secret, function(error, reply) {
+          return db.setAccessTokens(req.session.tw.user_name, "Twitter", callback.oauth_access_token, callback.oauth_access_token_secret, function(error, reply) {
             if (error) {
               return console.log("Error: " + error);
             } else {
