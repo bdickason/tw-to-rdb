@@ -17,3 +17,10 @@ exports.REDIS_HOSTNAME = process.env.REDIS_HOSTNAME || 'localhost'
 # Server Setup
 exports.HOSTNAME = process.env.HOSTNAME || 'localhost'
 exports.PORT = process.env.PORT || '3000'
+
+
+### Only needed for test suite ###
+# Twitter Password
+exports.TW_PASSWORD = process.env.TW_PASSWORD || ''
+# Readability Login
+# Readability Password

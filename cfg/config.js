@@ -24,4 +24,10 @@
 
   exports.PORT = process.env.PORT || '3000';
 
+  /* Only needed for test suite
+  */
+
+
+  exports.TW_PASSWORD = process.env.TW_PASSWORD || '';
+
 }).call(this);
