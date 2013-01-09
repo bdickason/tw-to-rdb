@@ -42,7 +42,7 @@ exports.Twitter = class Twitter
 
       @db.doesAccountExist user_name, "Twitter", (error, reply) =>
         if reply != 1  # User hasn't auth'd with twitter before
-          console.log "adding new Twitter account for user: #{req.session.tw.user_name}"
+          console.log "adding new Twitter account for user: #{user_name}"
           @db.createAccount user_name, "Twitter", (error) =>
             if error
               console.log "Error: " + error 

@@ -75,9 +75,8 @@ app.get '/tw/callback', (req, res) ->
     res.redirect '/'
   else    
     tw.handleCallback req.query.oauth_token, req.query.oauth_token_secret, req.query.oauth_verifier, (error, callback) ->
-      console.log callback
       req.session.tw.oauth_access_token = callback.oauth_access_token
-      req.session.tw.oauth_access_token_secret = callback.oauth_access_token_secret
+      req.session.tw.oauth_access_token_secret = callback.oauth_access_token_secre
       req.session.tw.user_name = callback.user_name
       req.session.tw.active = 1
       res.redirect '/'
@@ -95,19 +94,11 @@ app.get '/rdb/login', (req, res) ->
     res.redirect "https://www.readability.com/api/rest/v1/oauth/authorize/?oauth_token=#{callback.oauth_token}&oauth_token_secret=#{callback.oauth_token_secret}"
 
 app.get '/rdb/callback', (req, res) ->
-  rdb.handleCallback req.query.oauth_token, req.session.rdb.oauth_token_secret, req.query.oauth_verifier, (callback) ->
-    db.doesAccountExist req.session.tw.user_name, "Readability", (error, reply) =>
-      if reply != 1  # User hasn't auth'd with Readability before
-        console.log "adding new Readability account for user: #{req.session.tw.user_name}"
-        db.createAccount req.session.tw.user_name, "Readability", (error) =>
-          if error
-            console.log "Error: " + error
-      db.setAccessTokens req.session.tw.user_name, "Readability", callback.oauth_access_token, callback.oauth_access_token_secret, (error, reply) =>
-        if error
-          console.log "Error: " + error
-        else
-          req.session.rdb.active = 1
-          res.redirect '/'
+  rdb.handleCallback req.session.tw.user_name, req.query.oauth_token, req.session.rdb.oauth_token_secret, req.query.oauth_verifier, (error, callback) ->
+    req.session.rdb.oauth_access_token = callback.oauth_access_token
+    req.session.rdb.oauth_access_token_secret = callback.oauth_access_token_secret
+    req.session.rdb.active = 1
+    res.redirect '/'
   
 ### Support functions ###
 checkTweets = (user_name, callback) =>

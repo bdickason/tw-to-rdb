@@ -49,12 +49,22 @@ exports.Readability = class Readability
 
         callback { oauth_token, oauth_token_secret }
 
-    handleCallback:  (oauth_token, oauth_token_secret, oauth_verifier, callback) ->
+    handleCallback: (user_name, oauth_token, oauth_token_secret, oauth_verifier, callback) ->
+      # We use twitter usernames to identify users (user_name)
       # Grab Access Token
-      @oa.getOAuthAccessToken oauth_token, oauth_token_secret, oauth_verifier, (error, oauth_access_token, oauth_access_token_secret, response) ->
+      @oa.getOAuthAccessToken oauth_token, oauth_token_secret, oauth_verifier, (error, oauth_access_token, oauth_access_token_secret, response) =>
         if error
           console.log 'error :' + JSON.stringify error
-        if response is undefined
+        if !response
           console.log 'error: ' + response
-  
-        callback { oauth_access_token, oauth_access_token_secret }
+
+        @db.doesAccountExist user_name, "Readability", (error, reply) =>
+          if reply != 1  # User hasn't auth'd with twitter before
+            console.log "adding new Readability account for user: #{user_name}"
+            @db.createAccount user_name, "Readability", (error) =>
+              if error
+                console.log "Error: " + error 
+          @db.setAccessTokens user_name, "Readability", oauth_access_token, oauth_access_token_secret, (error, reply) =>
+            if error
+              console.log "Error: " + error
+            callback error, { oauth_access_token, oauth_access_token_secret }

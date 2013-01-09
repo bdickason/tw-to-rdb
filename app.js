@@ -108,9 +108,8 @@
       return res.redirect('/');
     } else {
       return tw.handleCallback(req.query.oauth_token, req.query.oauth_token_secret, req.query.oauth_verifier, function(error, callback) {
-        console.log(callback);
         req.session.tw.oauth_access_token = callback.oauth_access_token;
-        req.session.tw.oauth_access_token_secret = callback.oauth_access_token_secret;
+        req.session.tw.oauth_access_token_secret = callback.oauth_access_token_secre;
         req.session.tw.user_name = callback.user_name;
         req.session.tw.active = 1;
         return res.redirect('/');
@@ -134,26 +133,11 @@
   });
 
   app.get('/rdb/callback', function(req, res) {
-    return rdb.handleCallback(req.query.oauth_token, req.session.rdb.oauth_token_secret, req.query.oauth_verifier, function(callback) {
-      var _this = this;
-      return db.doesAccountExist(req.session.tw.user_name, "Readability", function(error, reply) {
-        if (reply !== 1) {
-          console.log("adding new Readability account for user: " + req.session.tw.user_name);
-          db.createAccount(req.session.tw.user_name, "Readability", function(error) {
-            if (error) {
-              return console.log("Error: " + error);
-            }
-          });
-        }
-        return db.setAccessTokens(req.session.tw.user_name, "Readability", callback.oauth_access_token, callback.oauth_access_token_secret, function(error, reply) {
-          if (error) {
-            return console.log("Error: " + error);
-          } else {
-            req.session.rdb.active = 1;
-            return res.redirect('/');
-          }
-        });
-      });
+    return rdb.handleCallback(req.session.tw.user_name, req.query.oauth_token, req.session.rdb.oauth_token_secret, req.query.oauth_verifier, function(error, callback) {
+      req.session.rdb.oauth_access_token = callback.oauth_access_token;
+      req.session.rdb.oauth_access_token_secret = callback.oauth_access_token_secret;
+      req.session.rdb.active = 1;
+      return res.redirect('/');
     });
   });
 
