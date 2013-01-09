@@ -121,10 +121,11 @@
               });
             });
           }
-          return db.redis.hmset("user:" + callback.user_name + ":Twitter", "access_token", callback.oauth_access_token, "access_token_secret", callback.oauth_access_token_secret, "active", 1, function(error, reply) {
+          return db.setAccessTokens(req.session.tw.user_name, "Readability", callback.oauth_access_token, callback.oauth_access_token_secret, function(error, reply) {
             if (error) {
               return console.log("Error: " + error);
             } else {
+              console.log(reply);
               req.session.tw.active = 1;
               return res.redirect('/');
             }
@@ -161,7 +162,7 @@
             }
           });
         }
-        return db.redis.hmset("user:" + cfg.TW_USERNAME + ":Readability", "access_token", callback.oauth_access_token, "access_token_secret", callback.oauth_access_token_secret, "active", 1, function(error, reply) {
+        return db.setAccessTokens(req.session.tw.user_name, "Readability", callback.oauth_access_token, callback.oauth_access_token_secret, function(error, reply) {
           if (error) {
             return console.log("Error: " + error);
           } else {

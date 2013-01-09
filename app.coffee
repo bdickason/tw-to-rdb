@@ -83,10 +83,11 @@ app.get '/tw/callback', (req, res) ->
             db.redis.sadd "user:#{callback.user_name}", "Twitter", (error) =>      
               if error
                 console.log "Error: " + error
-        db.redis.hmset "user:#{callback.user_name}:Twitter", "access_token", callback.oauth_access_token, "access_token_secret", callback.oauth_access_token_secret, "active", 1, (error, reply) ->
+        db.setAccessTokens req.session.tw.user_name, "Readability", callback.oauth_access_token, callback.oauth_access_token_secret, (error, reply) =>
           if error
             console.log "Error: " + error
           else
+            console.log reply
             req.session.tw.active = 1
             res.redirect '/'
 
@@ -110,7 +111,7 @@ app.get '/rdb/callback', (req, res) ->
         db.redis.sadd "user:#{cfg.TW_USERNAME}", "Readability", (error) ->      
           if error
             console.log "Error: " + error
-      db.redis.hmset "user:#{cfg.TW_USERNAME}:Readability", "access_token", callback.oauth_access_token, "access_token_secret", callback.oauth_access_token_secret, "active", 1, (error, reply) ->
+      db.setAccessTokens req.session.tw.user_name, "Readability", callback.oauth_access_token, callback.oauth_access_token_secret, (error, reply) =>
         if error
           console.log "Error: " + error
         else

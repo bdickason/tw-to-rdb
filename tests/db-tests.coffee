@@ -8,7 +8,8 @@ db = new Db cfg
 
 
 describe 'Redis is running', ->
-  
+
+  # Stub data
   testKey = 'testKey'
   testValue = 'testValue'
   
@@ -24,6 +25,7 @@ describe 'Redis is running', ->
 
 describe 'Access Tokens', ->
   
+  # Stub data
   testUsername = 'tester'
   testApp = 'TestApp'
   testAccessToken = '1234567890abcdef'
