@@ -17,9 +17,14 @@
       tmp = cfg.TW_CONSUMER_KEY;
       return tmp.should.not.eql('');
     });
-    return it('Should have a consumer secret', function() {
+    it('Should have a consumer secret', function() {
       var tmp;
       tmp = cfg.TW_CONSUMER_SECRET;
+      return tmp.should.not.eql('');
+    });
+    return it('Should have a twitter username set', function() {
+      var tmp;
+      tmp = cfg.TW_USERNAME;
       return tmp.should.not.eql('');
     });
   });
@@ -37,10 +42,15 @@
     });
   });
 
-  describe('Twitter Username', function() {
-    return it('Should have a twitter username set', function() {
+  describe('Server Config', function() {
+    it('Should have a hostname', function() {
       var tmp;
-      tmp = cfg.TW_USERNAME;
+      tmp = cfg.HOSTNAME;
+      return tmp.should.not.eql('');
+    });
+    return it('Should have a port number', function() {
+      var tmp;
+      tmp = cfg.PORT;
       return tmp.should.not.eql('');
     });
   });
