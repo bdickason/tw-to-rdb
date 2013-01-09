@@ -107,28 +107,13 @@
     if (req.query.denied) {
       return res.redirect('/');
     } else {
-      return tw.handleCallback(req.query.oauth_token, req.query.oauth_token_secret, req.query.oauth_verifier, function(callback) {
-        var _this = this;
+      return tw.handleCallback(req.query.oauth_token, req.query.oauth_token_secret, req.query.oauth_verifier, function(error, callback) {
+        console.log(callback);
+        req.session.tw.oauth_access_token = callback.oauth_access_token;
+        req.session.tw.oauth_access_token_secret = callback.oauth_access_token_secret;
         req.session.tw.user_name = callback.user_name;
-        return db.doesAccountExist(req.session.tw.user_name, "Twitter", function(error, reply) {
-          if (reply !== 1) {
-            console.log("adding new Twitter account for user: " + req.session.tw.user_name);
-            db.createAccount(req.session.tw.user_name, "Twitter", function(error) {
-              if (error) {
-                return console.log("Error: " + error);
-              }
-            });
-          }
-          return db.setAccessTokens(req.session.tw.user_name, "Twitter", callback.oauth_access_token, callback.oauth_access_token_secret, function(error, reply) {
-            if (error) {
-              return console.log("Error: " + error);
-            } else {
-              console.log(reply);
-              req.session.tw.active = 1;
-              return res.redirect('/');
-            }
-          });
-        });
+        req.session.tw.active = 1;
+        return res.redirect('/');
       });
     }
   });

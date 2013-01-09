@@ -32,10 +32,21 @@ exports.Twitter = class Twitter
 
   handleCallback:  (oauth_token, oauth_token_secret, oauth_verifier, callback) ->
     # Grab Access Token
-    @oa.getOAuthAccessToken oauth_token, oauth_token_secret, oauth_verifier, (error, oauth_access_token, oauth_access_token_secret, response) ->
+    @oa.getOAuthAccessToken oauth_token, oauth_token_secret, oauth_verifier, (error, oauth_access_token, oauth_access_token_secret, response) =>
       if error
         console.log 'error :' + JSON.stringify error
-      if response is undefined
+      else if !response
         console.log 'error: ' + response
 
-      callback { oauth_access_token, oauth_access_token_secret, "user_name": response.screen_name }
+      user_name = response.screen_name
+
+      @db.doesAccountExist user_name, "Twitter", (error, reply) =>
+        if reply != 1  # User hasn't auth'd with twitter before
+          console.log "adding new Twitter account for user: #{req.session.tw.user_name}"
+          @db.createAccount user_name, "Twitter", (error) =>
+            if error
+              console.log "Error: " + error 
+        @db.setAccessTokens user_name, "Twitter", oauth_access_token, oauth_access_token_secret, (error, reply) =>
+          if error
+            console.log "Error: " + error
+          callback error, { oauth_access_token, oauth_access_token_secret, "user_name": user_name }

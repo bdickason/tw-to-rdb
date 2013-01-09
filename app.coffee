@@ -74,21 +74,13 @@ app.get '/tw/callback', (req, res) ->
     # Twitter denied auth or user hit cancel
     res.redirect '/'
   else    
-    tw.handleCallback req.query.oauth_token, req.query.oauth_token_secret, req.query.oauth_verifier, (callback) ->
+    tw.handleCallback req.query.oauth_token, req.query.oauth_token_secret, req.query.oauth_verifier, (error, callback) ->
+      console.log callback
+      req.session.tw.oauth_access_token = callback.oauth_access_token
+      req.session.tw.oauth_access_token_secret = callback.oauth_access_token_secret
       req.session.tw.user_name = callback.user_name
-      db.doesAccountExist req.session.tw.user_name, "Twitter", (error, reply) =>
-        if reply != 1  # User hasn't auth'd with twitter before
-          console.log "adding new Twitter account for user: #{req.session.tw.user_name}"
-          db.createAccount req.session.tw.user_name, "Twitter", (error) =>
-            if error
-              console.log "Error: " + error 
-        db.setAccessTokens req.session.tw.user_name, "Twitter", callback.oauth_access_token, callback.oauth_access_token_secret, (error, reply) =>
-          if error
-            console.log "Error: " + error
-          else
-            console.log reply
-            req.session.tw.active = 1
-            res.redirect '/'
+      req.session.tw.active = 1
+      res.redirect '/'
 
 ### Readability Auth to retrieve access tokens, etc. ###
 app.get '/rdb/login', (req, res) ->
