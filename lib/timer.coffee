@@ -18,8 +18,8 @@ exports.Timer = class Timer
     else
       # Timer is stopped, let's go!
       @active = true
-      @interval = setInterval ->
-        console.log "test!"
+      @interval = setInterval =>
+        console.log @id
       , time
       callback error, "Done!"
   

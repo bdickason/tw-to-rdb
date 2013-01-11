@@ -49,7 +49,7 @@
         return browser.clickLink('Sign In with Twitter', function() {
           browser.success.should.equal(true);
           return browser.fill('session[username_or_email]', cfg.TW_USERNAME).fill('session[password]', cfg.TW_PASSWORD).pressButton('Sign In', function() {
-            return browser.wait('20', function() {
+            return browser.wait(20, function() {
               browser.statusCode.should.equal(200);
               return browser.clickLink('click here to continue', function() {
                 browser.success.should.equal(true);

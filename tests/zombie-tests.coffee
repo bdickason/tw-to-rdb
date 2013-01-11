@@ -41,7 +41,7 @@ describe 'Sessions', ->
         browser.fill('session[username_or_email]', cfg.TW_USERNAME)
           .fill('session[password]', cfg.TW_PASSWORD)
           .pressButton 'Sign In', ->
-            browser.wait '20', ->
+            browser.wait 20, ->
               browser.statusCode.should.equal 200
               browser.clickLink 'click here to continue', ->
                 browser.success.should.equal true
