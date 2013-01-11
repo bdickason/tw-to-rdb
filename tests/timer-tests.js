@@ -23,7 +23,7 @@
     it('Should be able to start a timer', function(done) {
       var timer;
       timer = new Timer(user_name, cfg, db);
-      return timer.startTimer(1, function(error, callback) {
+      return timer.startTimer(500, function(error, callback) {
         should.not.exist(error);
         callback.should.equal('Done!');
         return done();

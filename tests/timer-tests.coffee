@@ -15,7 +15,7 @@ describe 'Timers', ->
   
   it 'Should be able to start a timer', (done) ->
       timer = new Timer user_name, cfg, db
-      timer.startTimer 1, (error, callback) ->
+      timer.startTimer 500, (error, callback) ->
         should.not.exist error
         callback.should.equal 'Done!'
         done()
