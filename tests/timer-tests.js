@@ -25,6 +25,7 @@
       timer = new Timer(user_name, cfg, db);
       return timer.startTimer(500, function(error, callback) {
         should.not.exist(error);
+        timer.id.should.equal(user_name);
         callback.should.equal('Done!');
         return done();
       });

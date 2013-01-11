@@ -3,6 +3,7 @@ cfg = require './cfg/config.js'
 Twitter = (require './lib/twitter.js').Twitter
 Readability = (require './lib/readability.js').Readability
 Db = (require './lib/db.js').Db
+Timer = (require './lib/timer.js').Timer
 
 RedisStore = (require 'connect-redis')(express)
 
@@ -33,11 +34,14 @@ app.get '/', (req, res) ->
     if req.session.tw.user_name
       user_name = req.session.tw.user_name
   res.render 'index', { "session": req.session, "user_name": user_name }
-
+  
+app.get '/timer', (req, res) ->
+  timer = new Timer req.session.tw.user_name, cfg, db, tw, rdb
+  timer.startTimer 70000, (error, callback) ->
+    
 app.get '/check', (req, res) ->
   # Check for new favorites, save to readability
   checkTweets(req.session.tw.user_name)
-  console.log "Checking Tweets"
   res.redirect '/'
   
 app.get '/status', (req, res) ->
@@ -99,16 +103,7 @@ app.get '/rdb/callback', (req, res) ->
     req.session.rdb.oauth_access_token_secret = callback.oauth_access_token_secret
     req.session.rdb.active = 1
     res.redirect '/'
-  
-### Support functions ###
-checkTweets = (user_name, callback) =>
-  count = 10  # Check last 10 tweets by default
-  tw.getFavorites user_name, count, (callback) ->
-    if callback.length > 0
-      # There are tweets!
-      for tweet in callback
-        for url in tweet.entities.urls # Twitter creates an array of url's that have additional metadata
-          rdb.addBookmark user_name, { url: url.expanded_url }, (cb) ->      
+    
       
 ### Start the App ###
 app.listen "#{cfg.PORT}"

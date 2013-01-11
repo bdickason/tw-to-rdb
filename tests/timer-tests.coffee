@@ -17,6 +17,7 @@ describe 'Timers', ->
       timer = new Timer user_name, cfg, db
       timer.startTimer 500, (error, callback) ->
         should.not.exist error
+        timer.id.should.equal user_name
         callback.should.equal 'Done!'
         done()
 
