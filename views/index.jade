@@ -9,24 +9,24 @@ html(lang="en")
     .container
       center
         h1 Twitter Reading List
-      if user_name
-        .tmp
-          p 
-            a(href='/check/') Check for New Favorites
-          p 
-            a(href='/tw') Twitter: Get Favorites
       .auth
         #twitter
           p 
             if user_name
               a(href="http://www.twitter.com/#{user_name}", target="_blank") #{user_name}
             else
-              a(href='/tw/login') Sign In with Twitter
+              a(href='/tw/login') 1) Sign In with Twitter
           p 
             if user_name
-              a(href='/rdb/login') Sign In with Readability
+              a(href='/rdb/login') 2) Sign In with Readability
             else
-              a(href='#', class=(user_name === null ? 'disabled': "")) Sign In with Readability
+              a(href='#', class=(user_name === null ? 'disabled': "")) 2) Sign In with Readability
+      .tmp
+        p
+          if user_name
+            a(href='/timer') 3) Start syncing favorites (every 4.01 minutes)
+          else
+            a(href='#', class=(user_name === null ? 'disabled': "")) 3) Start syncing favorites
 
       #debug
         p Session: 
