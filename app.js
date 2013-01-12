@@ -73,7 +73,7 @@
   app.get('/timer/stop', function(req, res) {
     var timer;
     timer = new Timer(req.session.tw.user_name, cfg, db, tw, rdb);
-    return timer.startTimer(error, callback)(function() {});
+    return timer.startTimer('', function(error, callback) {});
   });
 
   app.get('/check', function(req, res) {

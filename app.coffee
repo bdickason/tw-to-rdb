@@ -41,7 +41,7 @@ app.get '/timer/start', (req, res) ->
 
 app.get '/timer/stop', (req, res) ->
   timer = new Timer req.session.tw.user_name, cfg, db, tw, rdb
-  timer.startTimer, (error, callback) ->
+  timer.startTimer '', (error, callback) ->
     
     
 app.get '/check', (req, res) ->
