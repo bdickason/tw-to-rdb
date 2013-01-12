@@ -35,9 +35,14 @@ app.get '/', (req, res) ->
       user_name = req.session.tw.user_name
   res.render 'index', { "session": req.session, "user_name": user_name }
   
-app.get '/timer', (req, res) ->
+app.get '/timer/start', (req, res) ->
   timer = new Timer req.session.tw.user_name, cfg, db, tw, rdb
   timer.startTimer 70000, (error, callback) ->
+
+app.get '/timer/stop', (req, res) ->
+  timer = new Timer req.session.tw.user_name, cfg, db, tw, rdb
+  timer.startTimer, (error, callback) ->
+    
     
 app.get '/check', (req, res) ->
   # Check for new favorites, save to readability
@@ -107,12 +112,3 @@ app.get '/rdb/callback', (req, res) ->
       
 ### Start the App ###
 app.listen "#{cfg.PORT}"
-
-# checkTweets -> # Run once immediately
-
-###
-# Trigger the loop to run every 4.01 mins. (Twitter rate limit is 1x/min)
-setInterval ->
-  checkTweets
-, 70000 # Run every 1.17 minutes aka 70,000ms
-###

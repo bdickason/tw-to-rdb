@@ -64,10 +64,16 @@
     });
   });
 
-  app.get('/timer', function(req, res) {
+  app.get('/timer/start', function(req, res) {
     var timer;
     timer = new Timer(req.session.tw.user_name, cfg, db, tw, rdb);
     return timer.startTimer(70000, function(error, callback) {});
+  });
+
+  app.get('/timer/stop', function(req, res) {
+    var timer;
+    timer = new Timer(req.session.tw.user_name, cfg, db, tw, rdb);
+    return timer.startTimer(error, callback)(function() {});
   });
 
   app.get('/check', function(req, res) {
@@ -152,13 +158,5 @@
 
 
   app.listen("" + cfg.PORT);
-
-  /*
-  # Trigger the loop to run every 4.01 mins. (Twitter rate limit is 1x/min)
-  setInterval ->
-    checkTweets
-  , 70000 # Run every 1.17 minutes aka 70,000ms
-  */
-
 
 }).call(this);
